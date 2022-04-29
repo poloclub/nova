@@ -57,6 +57,14 @@ import { drag } from 'd3-drag';
 
 import { format } from 'd3-format';
 
+import {
+  forceManyBody,
+  forceLink,
+  forceCollide,
+  forceCenter,
+  forceSimulation
+} from 'd3-force';
+
 import { timeFormat } from 'd3-time-format';
 
 export default {
@@ -110,5 +118,10 @@ export default {
   arc,
   linkHorizontal,
   linkVertical,
-  path
+  path,
+  forceManyBody,
+  forceLink,
+  forceCollide,
+  forceCenter,
+  forceSimulation
 };
