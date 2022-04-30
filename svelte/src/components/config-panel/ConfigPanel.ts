@@ -31,7 +31,7 @@ export const initForceParameters = (myGraph: Graph): ForceParameter[] => {
     id: 'node-strength',
     min: -200,
     max: 60,
-    value: -30,
+    value: myGraph.initStrengths?.nodeStrength || -30,
     step: 1,
     updateStrength: (d: number) => myGraph.updateNodeForceStrength(d)
   };
@@ -42,22 +42,33 @@ export const initForceParameters = (myGraph: Graph): ForceParameter[] => {
     id: 'link-strength',
     min: 0,
     max: 5,
-    value: 1,
+    value: myGraph.initStrengths?.linkStrength || 1,
     step: 0.01,
     updateStrength: (d: number) => myGraph.updateLinkForceStrength(d)
   };
   forceParameters.push(forceLinkParameter);
 
-  const forceCenterParameter: ForceParameter = {
+  const forceLinkDistanceParameter: ForceParameter = {
     name: 'Link Distance',
     id: 'link-distance',
     min: 0,
     max: myGraph.width / 3,
-    value: 30,
+    value: myGraph.initStrengths?.linkDistance || 30,
     step: 1,
     updateStrength: (d: number) => myGraph.updateLinkForceDistance(d)
   };
-  forceParameters.push(forceCenterParameter);
+  forceParameters.push(forceLinkDistanceParameter);
+
+  const forceCollideParameter: ForceParameter = {
+    name: 'Collision Strength',
+    id: 'collide-strength',
+    min: 0,
+    max: 20,
+    value: myGraph.initStrengths?.collideStrength || 1,
+    step: 0.5,
+    updateStrength: (d: number) => myGraph.updateCollideForceStrength(d)
+  };
+  forceParameters.push(forceCollideParameter);
 
   return forceParameters;
 };

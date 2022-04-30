@@ -15,6 +15,7 @@ export interface Strengths {
   nodeStrength?: number;
   linkStrength?: number;
   linkDistance?: number;
+  collideStrength?: number;
 }
 
 interface Node extends d3.SimulationNodeDatum {
@@ -52,9 +53,11 @@ export class Graph {
   nodeElements: d3.Selection<d3.BaseType, Node, SVGGElement, unknown>;
   linkElements: d3.Selection<d3.BaseType, Link, SVGGElement, unknown>;
 
+  initStrengths: Strengths | null;
   forceNode: d3.ForceManyBody<d3.SimulationNodeDatum>;
   forceLink: d3.ForceLink<d3.SimulationNodeDatum, Link>;
   forceCenter: d3.ForceCenter<d3.SimulationNodeDatum>;
+  forceCollide: d3.ForceCollide<d3.SimulationNodeDatum>;
 
   width: number;
   height: number;
@@ -108,6 +111,7 @@ export class Graph {
     this.nodeRadius = nodeRadius;
     this.maxLinkStrokeWidth = maxLinkStrokeWidth;
     this.minLinkStrokeWidth = minLinkStrokeWidth;
+    this.initStrengths = strengths;
 
     // Deep copy nodes and links from the data object
     this.nodes = data.nodes.map(d => ({ id: d.id }));
@@ -159,6 +163,10 @@ export class Graph {
     this.forceNode = d3.forceManyBody();
     this.forceLink = d3.forceLink(this.links).id(node => nodeIDs[node.index!]);
     this.forceCenter = d3.forceCenter(width / 2, height / 2);
+    this.forceCollide = d3
+      .forceCollide()
+      .radius(d => this.nodeRadius + 0.5)
+      .strength(1);
 
     // Set the initial strengths if they are provided
     if (strengths !== null) {
@@ -179,6 +187,9 @@ export class Graph {
       if (strengths.nodeStrength !== undefined) {
         this.forceNode.strength(strengths.nodeStrength);
       }
+      if (strengths.collideStrength !== undefined) {
+        this.forceCollide.strength(strengths.collideStrength);
+      }
     }
 
     this.simulation = d3
@@ -186,6 +197,7 @@ export class Graph {
       .force('link', this.forceLink)
       .force('charge', this.forceNode)
       .force('center', this.forceCenter)
+      .force('collide', this.forceCollide)
       .on('tick', () => this.#ticked());
 
     // Initialize the SVG element
@@ -319,8 +331,8 @@ export class Graph {
 
     const dragged = (e: d3.D3DragEvent<SVGCircleElement, Node, Node>) => {
       // Move the node to the targeted position using fixed position fx and fy
-      e.subject.fx = e.x;
-      e.subject.fy = e.y;
+      e.subject.fx = this.#boxBoundX(e.x);
+      e.subject.fy = this.#boxBoundY(e.y);
     };
 
     const dragended = (e: d3.D3DragEvent<SVGCircleElement, Node, Node>) => {
@@ -363,6 +375,14 @@ export class Graph {
   updateLinkForceDistance(newDistance: number) {
     // Update the forces
     this.forceLink.distance(newDistance);
+
+    // Update the simulation
+    this.simulation.alpha(0.3).restart();
+  }
+
+  updateCollideForceStrength(newStrength: number) {
+    // Update the forces
+    this.forceCollide.strength(newStrength);
 
     // Update the simulation
     this.simulation.alpha(0.3).restart();

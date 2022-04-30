@@ -11,10 +11,12 @@
     {
       name: 'StackOverflow Tag',
       file: 'stackoverflow.json',
-      strengths: { linkStrength: 3.6 }
+      strengths: { linkStrength: 4, collideStrength: 10 }
     },
     { name: 'Karate Club', file: 'karate.json', strengths: null }
   ];
+
+  let width = 600;
 </script>
 
 <style lang="scss">
@@ -40,10 +42,11 @@
     </div>
 
     {#key curDatasetIndex}
-      <div class="graph-container">
+      <div class="graph-container" style={`width: ${width}px;`}>
         <Graph
           modelFile={datasets[curDatasetIndex].file}
           strengths={datasets[curDatasetIndex].strengths}
+          {width}
         />
       </div>
     {/key}

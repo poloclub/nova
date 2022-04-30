@@ -8,14 +8,12 @@
 
   export let modelFile: string | null = null;
   export let strengths: Strengths | null = null;
+  export let width: number = 600;
 
   let myGraph: Graph | null = null;
   let component: HTMLElement | null = null;
   let initialized = false;
   let mounted = false;
-
-  const width = 600;
-  const height = 600;
 
   let nodeCount = 0;
   let edgeCount = 0;
@@ -23,12 +21,11 @@
 
   const initView = async () => {
     initialized = true;
-    // const modelFile = 'miserables.json';
-    // const modelFile = 'stackoverflow.json';
-    // const modelFile = 'karate.json';
     const loadedData = (await d3.json(
       `${import.meta.env.BASE_URL}data/${modelFile}`
     )) as GraphData;
+
+    const height = width;
 
     if (component) {
       myGraph = new Graph({
@@ -61,7 +58,7 @@
 
 <div
   class="graph-wrapper"
-  style={`width: ${width}; height: ${height}`}
+  style={`width: ${width}px; height: ${width}px;`}
   bind:this={component}
 >
   <svg class="graph-svg" />
@@ -80,6 +77,6 @@
     {@html iconSetting}
   </div>
   <div class="config-container" class:no-display={!configSelected}>
-    <ConfigPanel {height} {myGraph} {flipConfigSelected} />
+    <ConfigPanel height={width} {myGraph} {flipConfigSelected} />
   </div>
 </div>
