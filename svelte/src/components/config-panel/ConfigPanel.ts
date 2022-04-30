@@ -52,9 +52,9 @@ export const initForceParameters = (myGraph: Graph): ForceParameter[] => {
     name: 'Link Distance',
     id: 'link-distance',
     min: 0,
-    max: 100,
+    max: myGraph.width / 3,
     value: 30,
-    step: 0.5,
+    step: 1,
     updateStrength: (d: number) => myGraph.updateLinkForceDistance(d)
   };
   forceParameters.push(forceCenterParameter);

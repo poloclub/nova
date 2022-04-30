@@ -4,6 +4,7 @@
   import type { GraphData } from './Graph';
   import ConfigPanel from '../config-panel/ConfigPanel.svelte';
   import d3 from '../../d3-imports';
+  import iconSetting from '../../images/icon-gear.svg?raw';
 
   let myGraph: Graph | null = null;
   let component: HTMLElement | null = null;
@@ -15,6 +16,7 @@
 
   let nodeCount = 0;
   let edgeCount = 0;
+  let configSelected = false;
 
   const initView = async () => {
     initialized = true;
@@ -36,6 +38,10 @@
     edgeCount = loadedData.links.length;
   };
 
+  const flipConfigSelected = () => {
+    configSelected = !configSelected;
+  };
+
   onMount(() => {
     mounted = true;
   });
@@ -53,10 +59,21 @@
   bind:this={component}
 >
   <svg class="graph-svg" />
+
   <div class="graph-footer">
     {`${nodeCount} nodes, ${edgeCount} edges`}
   </div>
-  <div class="config-container">
-    <ConfigPanel {height} {myGraph} />
+
+  <div
+    class="config-button"
+    class:selected={configSelected}
+    on:click={() => {
+      flipConfigSelected();
+    }}
+  >
+    {@html iconSetting}
+  </div>
+  <div class="config-container" class:no-display={!configSelected}>
+    <ConfigPanel {height} {myGraph} {flipConfigSelected} />
   </div>
 </div>

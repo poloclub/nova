@@ -254,7 +254,7 @@ export class Graph {
     const dragstarted = (e: d3.D3DragEvent<SVGCircleElement, Node, Node>) => {
       // Restart the simulation if it has already paused
       if (!e.active) {
-        this.simulation.alphaTarget(0.3).restart();
+        this.simulation.alpha(0.3).restart();
       }
       // Init fixed position fx and fy
       e.subject.fx = e.subject.x;
@@ -286,7 +286,7 @@ export class Graph {
 
     // Update the simulation
     this.simulation.force('charge', this.forceNode);
-    this.simulation.alphaTarget(0.3).restart();
+    this.simulation.alpha(0.3).restart();
   }
 
   updateLinkForceStrength(newStrength: number) {
@@ -303,16 +303,15 @@ export class Graph {
 
     // Update the simulation
     this.simulation.force('link', this.forceLink);
-    this.simulation.alphaTarget(0.3).restart();
+    this.simulation.alpha(0.3).restart();
   }
 
   updateLinkForceDistance(newDistance: number) {
-    console.log(newDistance);
     // Update the forces
     this.forceLink.distance(newDistance);
 
     // Update the simulation
     this.simulation.force('center', this.forceCenter);
-    this.simulation.alphaTarget(0.3).restart();
+    this.simulation.alpha(0.3).restart();
   }
 }

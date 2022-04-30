@@ -4,17 +4,16 @@
   import { initForceParameters } from './ConfigPanel';
   import type { ForceParameter } from './ConfigPanel';
   import d3 from '../../d3-imports';
+  import iconClose from '../../images/icon-close.svg?raw';
 
   export let height: number;
-  export let myGraph: Graph;
+  export let myGraph: Graph | null = null;
+  export let flipConfigSelected: () => void = () => {};
 
   let component: HTMLElement | null = null;
   let initialized = false;
   let mounted = false;
   let forceParameters: ForceParameter[] | null = null;
-
-  let nodeCount = 0;
-  let edgeCount = 0;
 
   const initView = () => {
     if (myGraph) {
@@ -37,16 +36,25 @@
 </style>
 
 <div
-  class="config-wrapper"
+  class="parameter-wrapper"
   style={`max-height: ${Math.max(50, height - 30)}px;`}
   bind:this={component}
 >
-  <span class="title">Force Parameters</span>
+  <div class="parameter-title">
+    <span>Force Parameters</span>
+    <span class="svg-icon" on:click={() => flipConfigSelected()}
+      >{@html iconClose}</span
+    >
+  </div>
 
   {#if forceParameters !== null}
     {#each forceParameters as parameter}
       <div class="parameter-item">
-        <div class="parameter-name">{parameter.name}</div>
+        <div class="parameter">
+          <span class="parameter-name">{parameter.name}</span>
+          <span class="parameter-value">{parameter.value}</span>
+        </div>
+
         <input
           type="range"
           id={`${parameter.id}-slider`}
@@ -57,6 +65,7 @@
           value={parameter.value}
           step={parameter.step}
           on:input={e => {
+            parameter.value = parseFloat(e.currentTarget.value);
             parameter.updateStrength(parseFloat(e.currentTarget.value));
           }}
         />
