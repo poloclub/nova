@@ -1,10 +1,13 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { Graph } from './Graph';
-  import type { GraphData } from './Graph';
+  import type { GraphData, Strengths } from './Graph';
   import ConfigPanel from '../config-panel/ConfigPanel.svelte';
   import d3 from '../../d3-imports';
   import iconSetting from '../../images/icon-gear.svg?raw';
+
+  export let modelFile: string | null = null;
+  export let strengths: Strengths | null = null;
 
   let myGraph: Graph | null = null;
   let component: HTMLElement | null = null;
@@ -20,7 +23,9 @@
 
   const initView = async () => {
     initialized = true;
-    const modelFile = 'miserables.json';
+    // const modelFile = 'miserables.json';
+    // const modelFile = 'stackoverflow.json';
+    // const modelFile = 'karate.json';
     const loadedData = (await d3.json(
       `${import.meta.env.BASE_URL}data/${modelFile}`
     )) as GraphData;
@@ -29,6 +34,7 @@
       myGraph = new Graph({
         component,
         data: loadedData,
+        strengths,
         width,
         height
       });
@@ -46,7 +52,7 @@
     mounted = true;
   });
 
-  $: !initialized && mounted && component && initView();
+  $: !initialized && mounted && component && modelFile && initView();
 </script>
 
 <style lang="scss">

@@ -8,7 +8,13 @@ interface NodeData {
 interface LinkData {
   source: string;
   target: string;
-  value: number;
+  value?: number;
+}
+
+export interface Strengths {
+  nodeStrength?: number;
+  linkStrength?: number;
+  linkDistance?: number;
 }
 
 interface Node extends d3.SimulationNodeDatum {
@@ -72,6 +78,7 @@ export class Graph {
   constructor({
     component,
     data,
+    strengths = null,
     width = 300,
     height = 300,
     nodeRadius = 5,
@@ -80,6 +87,7 @@ export class Graph {
   }: {
     component: HTMLElement;
     data: GraphData;
+    strengths?: Strengths | null;
     width?: number;
     height?: number;
     nodeRadius?: number;
@@ -113,11 +121,19 @@ export class Graph {
     this.colorScale = d3.scaleOrdinal(this.nodeGroups, d3.schemeTableau10);
 
     // Construct the edge thickness scale
-    this.linkValues = data.links.map(d => d.value);
-    this.strokeWidthScale = d3
-      .scaleLinear()
-      .domain([Math.min(...this.linkValues), Math.max(...this.linkValues)])
-      .range([minLinkStrokeWidth, maxLinkStrokeWidth]);
+    this.linkValues = data.links.map(d => d.value || 0);
+
+    if (new Set(this.linkValues).size === 1) {
+      this.strokeWidthScale = d3
+        .scaleLinear()
+        .domain([this.linkValues[0], this.linkValues[0]])
+        .range([minLinkStrokeWidth, minLinkStrokeWidth]);
+    } else {
+      this.strokeWidthScale = d3
+        .scaleLinear()
+        .domain([Math.min(...this.linkValues), Math.max(...this.linkValues)])
+        .range([minLinkStrokeWidth, maxLinkStrokeWidth]);
+    }
 
     // Keep track link counts (used in updating link strength)
     const nodeLinkCounts: number[] = [];
@@ -143,6 +159,27 @@ export class Graph {
     this.forceNode = d3.forceManyBody();
     this.forceLink = d3.forceLink(this.links).id(node => nodeIDs[node.index!]);
     this.forceCenter = d3.forceCenter(width / 2, height / 2);
+
+    // Set the initial strengths if they are provided
+    if (strengths !== null) {
+      if (strengths.linkStrength !== undefined) {
+        this.forceLink.strength((link, i, links) => {
+          return (
+            strengths.linkStrength! /
+            Math.min(
+              this.countNodeLink(link.source as Node),
+              this.countNodeLink(link.target as Node)
+            )
+          );
+        });
+      }
+      if (strengths.linkDistance !== undefined) {
+        this.forceLink.strength(strengths.linkDistance);
+      }
+      if (strengths.nodeStrength !== undefined) {
+        this.forceNode.strength(strengths.nodeStrength);
+      }
+    }
 
     this.simulation = d3
       .forceSimulation(this.nodes)
@@ -220,6 +257,25 @@ export class Graph {
   }
 
   /**
+   * @param x Always keep nodes in the bounding box
+   * @returns new x
+   */
+  #boxBoundX(x: number) {
+    return Math.max(this.nodeRadius, Math.min(this.width - this.nodeRadius, x));
+  }
+
+  /**
+   * @param x Always keep nodes in the bounding box
+   * @returns new y
+   */
+  #boxBoundY(y: number) {
+    return Math.max(
+      this.nodeRadius,
+      Math.min(this.height - this.nodeRadius, y)
+    );
+  }
+
+  /**
    * Event handler for simulation ticking
    */
   #ticked() {
@@ -227,24 +283,24 @@ export class Graph {
     this.linkElements
       .attr('x1', d => {
         const source = d.source as Node;
-        return source.x ? source.x : 0;
+        return source.x ? this.#boxBoundX(source.x) : 0;
       })
       .attr('y1', d => {
         const source = d.source as Node;
-        return source.y ? source.y : 0;
+        return source.y ? this.#boxBoundY(source.y) : 0;
       })
       .attr('x2', d => {
         const target = d.target as Node;
-        return target.x ? target.x : 0;
+        return target.x ? this.#boxBoundX(target.x) : 0;
       })
       .attr('y2', d => {
         const target = d.target as Node;
-        return target.y ? target.y : 0;
+        return target.y ? this.#boxBoundY(target.y) : 0;
       });
 
     this.nodeElements
-      .attr('cx', d => (d.x !== undefined ? d.x : 0))
-      .attr('cy', d => (d.y !== undefined ? d.y : 0));
+      .attr('cx', d => (d.x !== undefined ? this.#boxBoundX(d.x) : 0))
+      .attr('cy', d => (d.y !== undefined ? this.#boxBoundY(d.y) : 0));
   }
 
   /**
@@ -285,7 +341,6 @@ export class Graph {
     this.forceNode.strength(newStrength);
 
     // Update the simulation
-    this.simulation.force('charge', this.forceNode);
     this.simulation.alpha(0.3).restart();
   }
 
@@ -302,7 +357,6 @@ export class Graph {
     });
 
     // Update the simulation
-    this.simulation.force('link', this.forceLink);
     this.simulation.alpha(0.3).restart();
   }
 
@@ -311,7 +365,6 @@ export class Graph {
     this.forceLink.distance(newDistance);
 
     // Update the simulation
-    this.simulation.force('center', this.forceCenter);
     this.simulation.alpha(0.3).restart();
   }
 }
