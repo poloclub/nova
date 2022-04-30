@@ -1,0 +1,28 @@
+.config-wrapper {
+  width: 170px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  font-size: 0.9rem;
+  padding: 5px 0 8px 0;
+}
+
+.title {
+  border-bottom: 1px solid var(--md-gray-300);
+  margin-bottom: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.parameter-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0px 10px;
+  width: 100%;
+}
+
+.slider {
+  width: 100%;
+}

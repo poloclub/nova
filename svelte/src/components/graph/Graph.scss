@@ -1,0 +1,31 @@
+.graph-wrapper {
+  background-color: var(--md-gray-50);
+  border: 1px solid var(--md-gray-300);
+  border-radius: 8px;
+
+  position: relative;
+}
+
+.graph-footer {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  padding: 2px 0 2px 8px;
+  border-top-right-radius: 5px;
+
+  background-color: hsla(0, 0%, 98.04%, 0.5);
+  color: var(--md-gray-700);
+  font-size: 0.9rem;
+  cursor: default;
+}
+
+.config-container {
+  position: absolute;
+  right: 0px;
+  top: 10px;
+  transform: translateX(calc(100% - 2px));
+  box-shadow: 0px 0px 1px 0px hsla(0, 0%, 0%, 0.07),
+    0px 0px 5px 0px hsla(0, 0%, 0%, 0.12);
+  border-radius: 5px;
+  background-color: white;
+}

@@ -2,7 +2,8 @@
   import { onMount } from 'svelte';
   import { Graph } from './Graph';
   import type { GraphData } from './Graph';
-  import d3 from '../d3-imports';
+  import ConfigPanel from '../config-panel/ConfigPanel.svelte';
+  import d3 from '../../d3-imports';
 
   let myGraph: Graph | null = null;
   let component: HTMLElement | null = null;
@@ -11,6 +12,9 @@
 
   const width = 600;
   const height = 600;
+
+  let nodeCount = 0;
+  let edgeCount = 0;
 
   const initView = async () => {
     initialized = true;
@@ -27,6 +31,9 @@
         height
       });
     }
+
+    nodeCount = loadedData.nodes.length;
+    edgeCount = loadedData.links.length;
   };
 
   onMount(() => {
@@ -46,4 +53,10 @@
   bind:this={component}
 >
   <svg class="graph-svg" />
+  <div class="graph-footer">
+    {`${nodeCount} nodes, ${edgeCount} edges`}
+  </div>
+  <div class="config-container">
+    <ConfigPanel {height} {myGraph} />
+  </div>
 </div>

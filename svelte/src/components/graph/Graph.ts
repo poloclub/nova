@@ -1,4 +1,4 @@
-import d3 from '../d3-imports';
+import d3 from '../../d3-imports';
 
 interface NodeData {
   id: string;
@@ -38,12 +38,17 @@ export class Graph {
   data: GraphData;
   nodes: Node[];
   links: Link[];
+  countNodeLink: (node: Node) => number;
 
   nodeGroups: string[];
   linkValues: number[];
 
   nodeElements: d3.Selection<d3.BaseType, Node, SVGGElement, unknown>;
   linkElements: d3.Selection<d3.BaseType, Link, SVGGElement, unknown>;
+
+  forceNode: d3.ForceManyBody<d3.SimulationNodeDatum>;
+  forceLink: d3.ForceLink<d3.SimulationNodeDatum, Link>;
+  forceCenter: d3.ForceCenter<d3.SimulationNodeDatum>;
 
   width: number;
   height: number;
@@ -114,19 +119,36 @@ export class Graph {
       .domain([Math.min(...this.linkValues), Math.max(...this.linkValues)])
       .range([minLinkStrokeWidth, maxLinkStrokeWidth]);
 
+    // Keep track link counts (used in updating link strength)
+    const nodeLinkCounts: number[] = [];
+    const nodeIDMap = new Map(this.nodes.map((d, i) => [d.id, i]));
+    for (const l of this.links) {
+      const sourceIndex = nodeIDMap.get(l.source as string)!;
+      const targetIndex = nodeIDMap.get(l.target as string)!;
+      nodeLinkCounts[sourceIndex] = (nodeLinkCounts[sourceIndex] || 0) + 1;
+      nodeLinkCounts[targetIndex] = (nodeLinkCounts[targetIndex] || 0) + 1;
+    }
+
+    this.countNodeLink = (node: Node) => {
+      const curIndex = nodeIDMap.get(node.id);
+      if (curIndex !== undefined) {
+        return nodeLinkCounts[curIndex];
+      } else {
+        return 0;
+      }
+    };
+
     // Initialize the force simulation
     const nodeIDs = data.nodes.map(d => d.id);
-    const forceNode = d3.forceManyBody();
-    const forceLink = d3.forceLink(this.links).id(node => nodeIDs[node.index!]);
-
-    // forceNode.strength(1);
-    // forceLink.strength(1);
+    this.forceNode = d3.forceManyBody();
+    this.forceLink = d3.forceLink(this.links).id(node => nodeIDs[node.index!]);
+    this.forceCenter = d3.forceCenter(width / 2, height / 2);
 
     this.simulation = d3
       .forceSimulation(this.nodes)
-      .force('link', forceLink)
-      .force('charge', forceNode)
-      .force('center', d3.forceCenter(width / 2, height / 2))
+      .force('link', this.forceLink)
+      .force('charge', this.forceNode)
+      .force('center', this.forceCenter)
       .on('tick', () => this.#ticked());
 
     // Initialize the SVG element
@@ -185,6 +207,10 @@ export class Graph {
       .style('stroke', 'white')
       .style('stroke-width', 1.5);
 
+    (
+      nodeElements as d3.Selection<SVGCircleElement, Node, SVGElement, unknown>
+    ).call(this.#dragFactory());
+
     // Add tooltips for nodes
     nodeElements
       .append('title')
@@ -219,5 +245,74 @@ export class Graph {
     this.nodeElements
       .attr('cx', d => (d.x !== undefined ? d.x : 0))
       .attr('cy', d => (d.y !== undefined ? d.y : 0));
+  }
+
+  /**
+   * Bind dragging related event handlers to nodes
+   */
+  #dragFactory() {
+    const dragstarted = (e: d3.D3DragEvent<SVGCircleElement, Node, Node>) => {
+      // Restart the simulation if it has already paused
+      if (!e.active) {
+        this.simulation.alphaTarget(0.3).restart();
+      }
+      // Init fixed position fx and fy
+      e.subject.fx = e.subject.x;
+      e.subject.fy = e.subject.y;
+    };
+
+    const dragged = (e: d3.D3DragEvent<SVGCircleElement, Node, Node>) => {
+      // Move the node to the targeted position using fixed position fx and fy
+      e.subject.fx = e.x;
+      e.subject.fy = e.y;
+    };
+
+    const dragended = (e: d3.D3DragEvent<SVGCircleElement, Node, Node>) => {
+      // Reset fixed position fx and fy
+      e.subject.fx = null;
+      e.subject.fy = null;
+    };
+
+    return d3
+      .drag<SVGCircleElement, Node>()
+      .on('start', dragstarted)
+      .on('drag', dragged)
+      .on('end', dragended);
+  }
+
+  updateNodeForceStrength(newStrength: number) {
+    // Update the forces
+    this.forceNode.strength(newStrength);
+
+    // Update the simulation
+    this.simulation.force('charge', this.forceNode);
+    this.simulation.alphaTarget(0.3).restart();
+  }
+
+  updateLinkForceStrength(newStrength: number) {
+    // Update the forces
+    this.forceLink.strength((link, i, links) => {
+      return (
+        newStrength /
+        Math.min(
+          this.countNodeLink(link.source as Node),
+          this.countNodeLink(link.target as Node)
+        )
+      );
+    });
+
+    // Update the simulation
+    this.simulation.force('link', this.forceLink);
+    this.simulation.alphaTarget(0.3).restart();
+  }
+
+  updateLinkForceDistance(newDistance: number) {
+    console.log(newDistance);
+    // Update the forces
+    this.forceLink.distance(newDistance);
+
+    // Update the simulation
+    this.simulation.force('center', this.forceCenter);
+    this.simulation.alphaTarget(0.3).restart();
   }
 }
