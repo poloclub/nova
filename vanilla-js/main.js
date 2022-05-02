@@ -15,7 +15,12 @@ const datasets = [
   },
   { name: 'Karate Club', file: 'karate.json', strengths: null }
 ];
-const curDatasetIndex = 0;
+let curDatasetIndex = 0;
+/** @type {HTMLElement} */
+const datasetComponent = document.querySelector('div.dataset-container');
+
+/** @type {GraphApp | null} */
+let myApp = null;
 
 class GraphApp {
   /** @type {HTMLElement} */
@@ -42,9 +47,23 @@ class GraphApp {
     this.configComponent = document.querySelector('div.config-container');
 
     /** @type {HTMLElement} */
-    this.buttonContainer = this.graphComponent.querySelector('.config-button');
+    this.buttonContainer = document.createElement('div');
+    this.buttonContainer.classList.add('config-button');
+    this.graphComponent.appendChild(this.buttonContainer);
 
     this.initView();
+  }
+
+  /**
+   * Destructor for GraphApp
+   */
+  destroy() {
+    this.graphComponent.querySelector('.graph-svg').remove();
+    this.configComponent.querySelector('.svg-icon').remove();
+    this.configComponent
+      .querySelectorAll('.parameter-item')
+      .forEach(d => d.remove());
+    this.buttonContainer.remove();
   }
 
   async initView() {
@@ -97,15 +116,17 @@ class GraphApp {
    */
   initConfigPanel = async () => {
     /** @type {HTMLElement} */
-    const component = document.querySelector('.parameter-wrapper');
+    const component = this.configComponent.querySelector('.parameter-wrapper');
 
     // Initialize the close button
-    const closeButton = component.querySelector('.parameter-title > .svg-icon');
+    const closeButton = document.createElement('span');
+    closeButton.classList.add('svg-icon');
     const closeButtonSVGRaw = await d3.text('images/icon-close.svg');
     closeButton.innerHTML = closeButtonSVGRaw;
     closeButton.addEventListener('click', () => {
       this.flipConfigDisplay();
     });
+    component.querySelector('.parameter-title').appendChild(closeButton);
 
     // Add parameter sliders
     const forceParameters = initForceParameters(this.myGraph);
@@ -163,5 +184,41 @@ class GraphApp {
   };
 }
 
+/**
+ * Initialize the dataset panel
+ */
+const initDatasetView = () => {
+  for (const [i, dataset] of datasets.entries()) {
+    const option = document.createElement('div');
+    option.classList.add('dataset-option');
+    option.setAttribute('id', `dataset-option-${i}`);
+    if (curDatasetIndex === i) {
+      option.classList.add('selected');
+    }
+    option.innerText = dataset.name;
+
+    // Click a dataset option switches the dataset
+    option.addEventListener('click', () => {
+      if (curDatasetIndex !== i) {
+        option.classList.add('selected');
+        datasetComponent
+          .querySelector(`#dataset-option-${curDatasetIndex}`)
+          .classList.remove('selected');
+        curDatasetIndex = i;
+      }
+
+      // Re-initialize the app component
+      myApp.destroy();
+      myApp = new GraphApp(width);
+    });
+
+    datasetComponent.appendChild(option);
+  }
+};
+
+// Initialize the dataset panel
+initDatasetView();
+
+// Initialize the app component
 const width = 600;
-const myApp = new GraphApp(width);
+myApp = new GraphApp(width);
