@@ -3,7 +3,7 @@ import './styles/app.css';
 import './styles/graph.css';
 import { Graph } from './scripts/graph';
 
-// Load the graph data
+// Configurations
 const datasets = [
   {
     name: 'Les Misérables Character',
@@ -19,30 +19,54 @@ const datasets = [
 ];
 const curDatasetIndex = 0;
 const width = 600;
+let myGraph = null;
+const configContainer = document.querySelector('.config-container');
 
 const initGraphView = async () => {
-  console.log('ahha');
-
   const modelFile = datasets[curDatasetIndex].file;
 
   // Load the dataset
   const loadedData = await d3.json(`data/${modelFile}`);
 
   // Draw the graph
-  const container = document.querySelector('.graph-container');
-  const component = document.createElement('div');
-  component.classList.add('graph-wrapper');
+  /** @type {HTMLElement} */
+  const component = document.querySelector('div.graph-wrapper');
   component.style.width = `${width}px`;
   component.style.height = `${width}px`;
-  container.appendChild(component);
 
-  const myGraph = new Graph({
+  myGraph = new Graph({
     component,
     data: loadedData,
     strengths: datasets[curDatasetIndex].strengths,
     width: width,
     height: width
   });
+
+  // Initialize the footer
+  const graphFooter = component.querySelector('.graph-footer');
+  graphFooter.textContent = `${loadedData.nodes.length} nodes, \
+    ${loadedData.links.length} edges`;
+
+  // Initialize the configuration button
+  const configButtonSVGRaw = await d3.text('images/icon-gear.svg');
+  const buttonContainer = component.querySelector('.config-button');
+  buttonContainer.innerHTML = configButtonSVGRaw;
+
+  // Bind event handler to the button
+  buttonContainer.addEventListener('click', () => {
+    if (configContainer.classList.contains('no-display')) {
+      configContainer.classList.remove('no-display');
+      buttonContainer.classList.add('selected');
+    } else {
+      configContainer.classList.add('no-display');
+      buttonContainer.classList.remove('selected');
+    }
+  });
+};
+
+const initConfigPanel = () => {
+  console.log('initing config panel');
 };
 
 initGraphView();
+initConfigPanel();
