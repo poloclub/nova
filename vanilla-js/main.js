@@ -1,7 +1,5 @@
-import './styles/main.css';
-import './styles/app.css';
-import './styles/graph.css';
 import { Graph } from './scripts/graph';
+import { initForceParameters } from './scripts/configPanel';
 
 // Configurations
 const datasets = [
@@ -19,9 +17,12 @@ const datasets = [
 ];
 const curDatasetIndex = 0;
 const width = 600;
-let myGraph = null;
 const configContainer = document.querySelector('.config-container');
 
+/**
+ * Initialize the graph view
+ * @returns Graph
+ */
 const initGraphView = async () => {
   const modelFile = datasets[curDatasetIndex].file;
 
@@ -34,7 +35,7 @@ const initGraphView = async () => {
   component.style.width = `${width}px`;
   component.style.height = `${width}px`;
 
-  myGraph = new Graph({
+  const myGraph = new Graph({
     component,
     data: loadedData,
     strengths: datasets[curDatasetIndex].strengths,
@@ -62,11 +63,68 @@ const initGraphView = async () => {
       buttonContainer.classList.remove('selected');
     }
   });
+
+  return myGraph;
 };
 
-const initConfigPanel = () => {
-  console.log('initing config panel');
+/**
+ * Initialize the configuration panel
+ * @param {Graph} myGraph Graph object
+ */
+const initConfigPanel = async myGraph => {
+  /** @type {HTMLElement} */
+  const component = document.querySelector('.parameter-wrapper');
+
+  // Initialize the close button
+  const closeButton = component.querySelector('.parameter-title > .svg-icon');
+  const closeButtonSVGRaw = await d3.text('images/icon-close.svg');
+  closeButton.innerHTML = closeButtonSVGRaw;
+
+  // Add parameter sliders
+  const forceParameters = initForceParameters(myGraph);
+
+  // For each parameter, create a parameter-item element
+  for (const param of forceParameters) {
+    const item = document.createElement('div');
+    item.classList.add('parameter-item');
+    component.appendChild(item);
+
+    const parameter = document.createElement('div');
+    parameter.classList.add('parameter');
+    item.appendChild(parameter);
+
+    const name = document.createElement('span');
+    name.classList.add('parameter-name');
+    name.innerText = param.name;
+    parameter.append(name);
+
+    const value = document.createElement('span');
+    value.classList.add('parameter-value');
+    value.innerText = param.value;
+    parameter.append(value);
+
+    const slider = document.createElement('input');
+    slider.setAttribute('type', 'range');
+    slider.setAttribute('id', `${param.id}-slider`);
+    slider.classList.add('slider');
+    slider.setAttribute('name', `${param.id}`);
+    slider.setAttribute('min', `${param.min}`);
+    slider.setAttribute('max', `${param.max}`);
+    slider.setAttribute('value', `${param.value}`);
+    slider.setAttribute('step', `${param.step}`);
+    slider.addEventListener('input', e => {
+      // @ts-ignore
+      const newValue = e.currentTarget.value;
+      value.innerText = newValue;
+      param.updateStrength(parseFloat(newValue));
+    });
+    item.appendChild(slider);
+  }
 };
 
-initGraphView();
-initConfigPanel();
+const initView = async () => {
+  const myGraph = await initGraphView();
+  await initConfigPanel(myGraph);
+};
+
+initView();
