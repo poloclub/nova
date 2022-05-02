@@ -1,5 +1,5 @@
-import { Graph } from './scripts/graph';
-import { initForceParameters } from './scripts/configPanel';
+import { Graph } from './scripts/graph.js';
+import { initForceParameters } from './scripts/configPanel.js';
 
 // Configurations
 const datasets = [
@@ -100,7 +100,8 @@ class GraphApp {
     ${loadedData.links.length} edges`;
 
     // Initialize the configuration button
-    const configButtonSVGRaw = await d3.text('images/icon-gear.svg');
+    const fetchResponse = await fetch('images/icon-gear.svg');
+    const configButtonSVGRaw = await fetchResponse.text();
     this.buttonContainer.innerHTML = configButtonSVGRaw;
 
     // Bind event handler to the button
@@ -121,7 +122,9 @@ class GraphApp {
     // Initialize the close button
     const closeButton = document.createElement('span');
     closeButton.classList.add('svg-icon');
-    const closeButtonSVGRaw = await d3.text('images/icon-close.svg');
+    const fetchResponse = await fetch('images/icon-close.svg');
+    const closeButtonSVGRaw = await fetchResponse.text();
+
     closeButton.innerHTML = closeButtonSVGRaw;
     closeButton.addEventListener('click', () => {
       this.flipConfigDisplay();

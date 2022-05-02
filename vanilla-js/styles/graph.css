@@ -54,6 +54,7 @@
   align-items: center;
 
   transition: color 100ms ease-in-out, background-color 100ms ease-in-out;
+  animation: fade-in 150ms ease-in-out;
 }
 
 .config-button svg {

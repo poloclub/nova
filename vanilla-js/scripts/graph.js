@@ -140,8 +140,6 @@ export class Graph {
    * Draw the initial view
    */
   drawGraphView() {
-    console.log(this.data);
-
     const content = this.svg
       .append('g')
       .attr('class', 'content')
