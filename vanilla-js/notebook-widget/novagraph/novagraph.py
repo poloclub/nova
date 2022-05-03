@@ -1,9 +1,9 @@
 from math import floor
-from platform import node
 import random
 import html
 import base64
 import pkgutil
+from re import L
 
 from IPython.display import display_html
 from json import dumps
@@ -30,13 +30,23 @@ def _make_html(
     Return:
         HTML code with deferred JS code in base64 format
     """
-    # HTML template for the widget
-    html_top = """<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Nova Graph</title>"""
-    html_bottom = """</head><body></body></html>"""
 
-    # Embed global style
-    css_str = pkgutil.get_data(__name__, "global.css").decode("utf-8")
-    html_top += f"<style>{css_str}</style>"
+    # Read the HTML template
+    html_str = pkgutil.get_data(__name__, "index.html").decode("utf-8")
+
+    # Embed CSS styles
+    css_str_all = ""
+    css_files = ["app.css", "configPanel.css", "graph.css", "main.css"]
+    for css_file in css_files:
+        css_str = pkgutil.get_data(__name__, f"{css_file}").decode("utf-8")
+        css_str_all += css_str
+    css_str_all = css_str_all.replace("\s", "").replace("\n", "")
+    html_str = html_str.replace("<!--style-slot-->", f"<style>{css_str_all}</style>")
+
+    # Embed assets (svg images)
+    icon_logo_str = pkgutil.get_data(__name__, "images/icon-logo.svg").decode("utf-8")
+    icon_gear_str = pkgutil.get_data(__name__, "images/icon-gear.svg").decode("utf-8")
+    icon_close_str = pkgutil.get_data(__name__, "images/icon-close.svg").decode("utf-8")
 
     # Read the bundled JS file
     js_b = pkgutil.get_data(__name__, "novagraph.js")
@@ -62,6 +72,9 @@ def _make_html(
             event.linkStrength = {link_strength};
             event.linkDistance = {link_distance};
             event.collideStrength = {collide_strength};
+            event.iconLogoSVG = `{icon_logo_str}`;
+            event.iconGearSVG = `{icon_gear_str}`;
+            event.iconCloseSVG = `{icon_close_str}`;
             document.dispatchEvent(event);
         }}())
     """
@@ -69,15 +82,17 @@ def _make_html(
     messenger_js_base64 = base64.b64encode(messenger_js).decode("utf-8")
 
     # Inject the JS to the html template
-    html_str = (
-        html_top
-        + """<script defer src='data:text/javascript;base64,{}'></script>""".format(
-            js_base64
-        )
-        + """<script defer src='data:text/javascript;base64,{}'></script>""".format(
+    html_str = html_str.replace(
+        "<!--js-slot-->",
+        """<script data-notebookMode="true" data-package="{}" src='data:text/javascript;base64,{}'></script>""".format(
+            __name__, js_base64
+        ),
+    )
+    html_str = html_str.replace(
+        "<!--message-slot-->",
+        """<script src='data:text/javascript;base64,{}'></script>""".format(
             messenger_js_base64
-        )
-        + html_bottom
+        ),
     )
 
     return html.escape(html_str)

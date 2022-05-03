@@ -38,8 +38,18 @@ class GraphApp {
   /** @type {number} */
   width;
 
-  constructor(width) {
+  /** @type {boolean} */
+  notebookMode = false;
+
+  iconLogoSVG = null;
+  iconGearSVG = null;
+  iconCloseSVG = null;
+
+  constructor(width, notebookMode = false, packagePath = '') {
     this.width = width;
+    this.notebookMode = notebookMode;
+    this.packagePath = packagePath;
+
     /** @type {HTMLElement} */
     this.graphComponent = document.querySelector('div.graph-wrapper');
 
@@ -51,7 +61,7 @@ class GraphApp {
     this.buttonContainer.classList.add('config-button');
     this.graphComponent.appendChild(this.buttonContainer);
 
-    this.initView();
+    this.initGraphView();
   }
 
   /**
@@ -66,50 +76,94 @@ class GraphApp {
     this.buttonContainer.remove();
   }
 
-  async initView() {
-    this.myGraph = await this.initGraphView();
-    await this.initConfigPanel();
-  }
-
   /**
    * Initialize the graph view
    * @returns Graph
    */
   initGraphView = async () => {
-    const modelFile = datasets[curDatasetIndex].file;
+    // Wait for users to pass datasets
+    if (this.notebookMode) {
+      document.addEventListener('novaGraphData', async notebookEvent => {
+        const data = notebookEvent.data;
+        this.width = notebookEvent.width;
+        const strengths = {
+          nodeStrength: notebookEvent.nodeStrength,
+          linkStrength: notebookEvent.linkStrength,
+          linkDistance: notebookEvent.linkDistance,
+          collideStrength: notebookEvent.collideStrength
+        };
 
-    // Load the dataset
-    const loadedData = await d3.json(`data/${modelFile}`);
+        this.graphComponent.style.width = `${this.width}px`;
+        this.graphComponent.style.height = `${this.width}px`;
 
-    // Draw the graph
-    /** @type {HTMLElement} */
-    this.graphComponent.style.width = `${this.width}px`;
-    this.graphComponent.style.height = `${this.width}px`;
+        // Save the image assets
+        this.iconGearSVG = notebookEvent.iconGearSVG;
+        this.iconLogoSVG = notebookEvent.iconLogoSVG;
+        this.iconCloseSVG = notebookEvent.iconCloseSVG;
 
-    const myGraph = new Graph({
-      component: this.graphComponent,
-      data: loadedData,
-      strengths: datasets[curDatasetIndex].strengths,
-      width: this.width,
-      height: this.width
-    });
+        this.myGraph = new Graph({
+          component: this.graphComponent,
+          data: data,
+          strengths: strengths,
+          width: this.width,
+          height: this.width
+        });
 
-    // Initialize the footer
+        // Initialize the footer and config panel
+        await this.initFooter(data);
+        await this.initConfigPanel();
+      });
+    } else {
+      const modelFile = datasets[curDatasetIndex].file;
+
+      // Load the dataset
+      const data = await d3.json(`data/${modelFile}`);
+
+      // Draw the graph
+      /** @type {HTMLElement} */
+      this.graphComponent.style.width = `${this.width}px`;
+      this.graphComponent.style.height = `${this.width}px`;
+
+      this.myGraph = new Graph({
+        component: this.graphComponent,
+        data: data,
+        strengths: datasets[curDatasetIndex].strengths,
+        width: this.width,
+        height: this.width
+      });
+
+      // Initialize the footer and config panel
+      await this.initFooter(data);
+      await this.initConfigPanel();
+    }
+  };
+
+  // Initialize the footer
+  initFooter = async data => {
     const graphFooter = this.graphComponent.querySelector('.graph-footer');
-    graphFooter.textContent = `${loadedData.nodes.length} nodes, \
-    ${loadedData.links.length} edges`;
+    graphFooter.querySelector(
+      '.stats'
+    ).textContent = `${data.nodes.length} nodes, \
+      ${data.links.length} edges`;
 
-    // Initialize the configuration button
-    const fetchResponse = await fetch('images/icon-gear.svg');
-    const configButtonSVGRaw = await fetchResponse.text();
-    this.buttonContainer.innerHTML = configButtonSVGRaw;
+    if (this.notebookMode) {
+      graphFooter.querySelector('.name').innerHTML = this.iconLogoSVG;
+      this.buttonContainer.innerHTML = this.iconGearSVG;
+    } else {
+      let fetchResponse = await fetch('/images/icon-logo.svg');
+      const logoIconSVGRaw = await fetchResponse.text();
+      graphFooter.querySelector('.name').innerHTML = logoIconSVGRaw;
+
+      // Initialize the configuration button
+      fetchResponse = await fetch('images/icon-gear.svg');
+      const configButtonSVGRaw = await fetchResponse.text();
+      this.buttonContainer.innerHTML = configButtonSVGRaw;
+    }
 
     // Bind event handler to the button
     this.buttonContainer.addEventListener('click', () => {
       this.flipConfigDisplay();
     });
-
-    return myGraph;
   };
 
   /**
@@ -119,13 +173,28 @@ class GraphApp {
     /** @type {HTMLElement} */
     const component = this.configComponent.querySelector('.parameter-wrapper');
 
+    // Check if the screen is small; if so, we show the config panel on top of
+    // the main window
+    const panelRoom = Math.floor((window.innerWidth - this.width) / 2);
+    if (panelRoom < 190) {
+      this.configComponent.style.transform = `translateX(calc(100% - ${
+        190 - panelRoom + 5
+      }px)`;
+      this.configComponent.style.top = '42px';
+    }
+
     // Initialize the close button
     const closeButton = document.createElement('span');
     closeButton.classList.add('svg-icon');
-    const fetchResponse = await fetch('images/icon-close.svg');
-    const closeButtonSVGRaw = await fetchResponse.text();
 
-    closeButton.innerHTML = closeButtonSVGRaw;
+    if (this.notebookMode) {
+      closeButton.innerHTML = this.iconCloseSVG;
+    } else {
+      const fetchResponse = await fetch('images/icon-close.svg');
+      const closeButtonSVGRaw = await fetchResponse.text();
+      closeButton.innerHTML = closeButtonSVGRaw;
+    }
+
     closeButton.addEventListener('click', () => {
       this.flipConfigDisplay();
     });
@@ -219,9 +288,19 @@ const initDatasetView = () => {
   }
 };
 
-// Initialize the dataset panel
-initDatasetView();
+// Parse the attribute to get parameters from HTML
+const notebookMode =
+  document
+    .querySelector('script[data-notebookMode]')
+    .getAttribute('data-notebookMode') === 'true'
+    ? true
+    : false;
+
+// Initialize the dataset panel if not in notebook mode
+if (!notebookMode) {
+  initDatasetView();
+}
 
 // Initialize the app component
 const width = 600;
-myApp = new GraphApp(width);
+myApp = new GraphApp(width, notebookMode);

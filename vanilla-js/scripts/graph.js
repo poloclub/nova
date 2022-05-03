@@ -102,7 +102,7 @@ export class Graph {
         });
       }
       if (strengths.linkDistance !== undefined) {
-        this.forceLink.strength(strengths.linkDistance);
+        this.forceLink.distance(strengths.linkDistance);
       }
       if (strengths.nodeStrength !== undefined) {
         this.forceNode.strength(strengths.nodeStrength);

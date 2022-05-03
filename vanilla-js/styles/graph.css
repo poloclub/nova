@@ -11,13 +11,26 @@
   position: absolute;
   left: 0px;
   bottom: 0px;
-  padding: 2px 0 2px 8px;
+  padding: 2px 8px;
   border-top-right-radius: 5px;
 
   background-color: hsla(0, 0%, 98.04%, 0.5);
   color: var(--md-gray-700);
   font-size: 0.9rem;
   cursor: default;
+
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.graph-footer a .name {
+  color: var(--md-gray-400);
+}
+
+.graph-footer a .name svg {
+  fill: currentColor;
+  height: 12px;
 }
 
 .config-container {

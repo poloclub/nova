@@ -11,6 +11,10 @@
   background-color: white;
 }
 
+.main-app.notebook {
+  max-height: unset;
+}
+
 .top-grid {
   width: 100%;
   display: grid;
@@ -21,6 +25,10 @@
 .graph-container {
   grid-column: mid-start / mid-end;
   aspect-ratio: 1 / 1;
+}
+
+.graph-container.left-align {
+  grid-column: start / mid-start;
 }
 
 .dataset-container {
