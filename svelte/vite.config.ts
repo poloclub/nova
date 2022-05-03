@@ -21,13 +21,13 @@ export default defineConfig(({ command, mode }) => {
         // Production: notebook widget
         return {
           build: {
-            outDir: 'notebook-widget/_nova-graph',
+            outDir: 'notebook-widget/_novagraph',
             sourcemap: false,
             lib: {
               entry: 'src/main-notebook.ts',
               formats: ['iife'],
               name: 'novaGraph',
-              fileName: format => 'nova-graph.js'
+              fileName: format => 'novagraph.js'
             }
           },
           plugins: [
@@ -42,7 +42,7 @@ export default defineConfig(({ command, mode }) => {
                   path.resolve(options.dir, options.entryFileNames as string),
                   path.resolve(
                     __dirname,
-                    'notebook-widget/nova-graph/nova-graph.js'
+                    'notebook-widget/novagraph/novagraph.js'
                   ),
                   error => {
                     if (error) throw error;
