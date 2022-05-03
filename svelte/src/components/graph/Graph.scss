@@ -11,19 +11,32 @@
   position: absolute;
   left: 0px;
   bottom: 0px;
-  padding: 2px 0 2px 8px;
+  padding: 2px 8px;
   border-top-right-radius: 5px;
 
   background-color: hsla(0, 0%, 98.04%, 0.5);
   color: var(--md-gray-700);
   font-size: 0.9rem;
   cursor: default;
+
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
+  a .name {
+    color: var(--md-gray-400);
+
+    :global(svg) {
+      fill: currentColor;
+      height: 12px;
+    }
+  }
 }
 
 .config-container {
   position: absolute;
   right: 0px;
-  top: 15px;
+  top: 25px;
   transform: translateX(calc(100% - 3px));
   box-shadow: 0px 0px 1px 0px hsla(0, 0%, 0%, 0.07),
     0px 0px 5px 0px hsla(0, 0%, 0%, 0.12);

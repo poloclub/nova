@@ -14,6 +14,7 @@
   let initialized = false;
   let mounted = false;
   let forceParameters: ForceParameter[] | null = null;
+  const panelStyle = `max-height: ${Math.max(50, height - 30)}px;`;
 
   const initView = () => {
     if (myGraph) {
@@ -35,11 +36,7 @@
   @import 'ConfigPanel.scss';
 </style>
 
-<div
-  class="parameter-wrapper"
-  style={`max-height: ${Math.max(50, height - 30)}px;`}
-  bind:this={component}
->
+<div class="parameter-wrapper" style={panelStyle} bind:this={component}>
   <div class="parameter-title">
     <span>Force Parameters</span>
     <span class="svg-icon" on:click={() => flipConfigSelected()}

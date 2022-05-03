@@ -171,7 +171,7 @@ export class Graph {
     // Set the initial strengths if they are provided
     if (strengths !== null) {
       if (strengths.linkStrength !== undefined) {
-        this.forceLink.strength((link, i, links) => {
+        this.forceLink.strength(link => {
           return (
             strengths.linkStrength! /
             Math.min(
@@ -182,7 +182,7 @@ export class Graph {
         });
       }
       if (strengths.linkDistance !== undefined) {
-        this.forceLink.strength(strengths.linkDistance);
+        this.forceLink.distance(strengths.linkDistance);
       }
       if (strengths.nodeStrength !== undefined) {
         this.forceNode.strength(strengths.nodeStrength);
@@ -219,8 +219,6 @@ export class Graph {
    * Draw the initial view
    */
   drawGraphView() {
-    console.log(this.data);
-
     const content = this.svg
       .append('g')
       .attr('class', 'content')

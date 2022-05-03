@@ -8,6 +8,11 @@
   overflow-x: hidden;
 
   position: relative;
+  background-color: white;
+
+  &.notebook {
+    max-height: unset;
+  }
 }
 
 .top-grid {
@@ -20,6 +25,10 @@
 .graph-container {
   grid-column: mid-start / mid-end;
   aspect-ratio: 1 / 1;
+
+  &.left-align {
+    grid-column: start / mid-start;
+  }
 }
 
 .dataset-container {

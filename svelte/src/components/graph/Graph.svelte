@@ -3,42 +3,39 @@
   import { Graph } from './Graph';
   import type { GraphData, Strengths } from './Graph';
   import ConfigPanel from '../config-panel/ConfigPanel.svelte';
-  import d3 from '../../d3-imports';
   import iconSetting from '../../images/icon-gear.svg?raw';
+  import iconLogo from '../../images/icon-logo.svg?raw';
 
-  export let modelFile: string | null = null;
   export let strengths: Strengths | null = null;
-  export let width: number = 600;
+  export let width = 600;
+  export let data: GraphData | null = null;
 
   let myGraph: Graph | null = null;
   let component: HTMLElement | null = null;
   let initialized = false;
   let mounted = false;
+  let configPanelStyle = '';
 
   let nodeCount = 0;
   let edgeCount = 0;
   let configSelected = false;
 
-  const initView = async () => {
-    initialized = true;
-    const loadedData = (await d3.json(
-      `${import.meta.env.BASE_URL}data/${modelFile}`
-    )) as GraphData;
+  const initView = () => {
+    if (data) {
+      initialized = true;
+      if (component) {
+        myGraph = new Graph({
+          component,
+          data,
+          strengths,
+          width,
+          height: width
+        });
+      }
 
-    const height = width;
-
-    if (component) {
-      myGraph = new Graph({
-        component,
-        data: loadedData,
-        strengths,
-        width,
-        height
-      });
+      nodeCount = data.nodes.length;
+      edgeCount = data.links.length;
     }
-
-    nodeCount = loadedData.nodes.length;
-    edgeCount = loadedData.links.length;
   };
 
   const flipConfigSelected = () => {
@@ -47,9 +44,18 @@
 
   onMount(() => {
     mounted = true;
+    // Check if the screen is small; if so, we show the config panel on top of
+    // the main window
+    const panelRoom = Math.floor((window.innerWidth - width) / 2);
+    if (panelRoom < 190) {
+      configPanelStyle = configPanelStyle.concat(
+        `transform: translateX(calc(100% - ${190 - panelRoom + 5}px)); \
+         top: 42px;`
+      );
+    }
   });
 
-  $: !initialized && mounted && component && modelFile && initView();
+  $: !initialized && mounted && component && data && initView();
 </script>
 
 <style lang="scss">
@@ -64,7 +70,10 @@
   <svg class="graph-svg" />
 
   <div class="graph-footer">
-    {`${nodeCount} nodes, ${edgeCount} edges`}
+    <span>{`${nodeCount} nodes, ${edgeCount} edges`}</span>
+    <a href="https://github.com/poloclub/nova" target="_blank"
+      ><span class="name">{@html iconLogo}</span></a
+    >
   </div>
 
   <div
@@ -76,7 +85,11 @@
   >
     {@html iconSetting}
   </div>
-  <div class="config-container" class:no-display={!configSelected}>
+  <div
+    class="config-container"
+    class:no-display={!configSelected}
+    style={configPanelStyle}
+  >
     <ConfigPanel height={width} {myGraph} {flipConfigSelected} />
   </div>
 </div>
