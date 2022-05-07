@@ -45,7 +45,7 @@ setup(
     long_description_content_type="text/markdown",
     include_package_data=True,
     name="nova-graph",
-    packages=find_packages(include=["nova-graph", "nova-graph.*"]),
+    packages=find_packages(include=["novagraph", "novagraph.*"]),
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/poloclub/nova",
