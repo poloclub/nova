@@ -37,12 +37,6 @@ def _make_html(
     data_json = dumps(data)
 
     html_str = html_str.replace('notebookMode:!1', 'notebookMode:1')
-    # html_str = html_str.replace('"insert data here"', data_json)
-    # html_str = html_str.replace('"insert width here"', str(width))
-    # html_str = html_str.replace('"insert node strength here"', str(node_strength))
-    # html_str = html_str.replace('"insert link strength here"', str(link_strength))
-    # html_str = html_str.replace('"insert link distance here"', str(link_distance))
-    # html_str = html_str.replace('"insert collide strength here"', str(collide_strength))
 
     stropen = "{"
     strclose = "}"
