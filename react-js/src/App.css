@@ -62,7 +62,7 @@
   line-height: 1;
 }
 
-.dataset-option.selected {
+.dataset-option-selected {
   border-bottom: 1px solid var(--md-gray-400);
 }
 
@@ -72,8 +72,4 @@
 
 .left-align {
   grid-column: start / mid-start;
-}
-
-.selected {
-  border-bottom: 1px solid var(--md-gray-400);
 }

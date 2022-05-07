@@ -55,7 +55,7 @@ const App = ({notebookMode, options}) => {
               <div className="dataset-container">
                 <div className="dataset-title">Choose a graph</div>
                 {datasets.map((dataset, index) => (
-                  <div className={`dataset-option ${curDatasetIndex === index ? 'selected' : ''}`} key={index} onClick={async () => {
+                  <div className={`dataset-option ${curDatasetIndex === index ? 'dataset-option-selected' : ''}`} key={index} onClick={async () => {
                     setCurDatasetIndex(index)
                     setData(dataset.data)
                     setStrengths(dataset.strengths);
