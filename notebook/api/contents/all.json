@@ -1,0 +1,61 @@
+{
+  "content": [
+    {
+      "content": null,
+      "created": "2022-05-07T17:51:47.478502Z",
+      "format": null,
+      "last_modified": "2022-04-30T19:56:05.202649Z",
+      "mimetype": "application/json",
+      "name": "stackoverflow.json",
+      "path": "stackoverflow.json",
+      "size": 36441,
+      "type": "file",
+      "writable": true
+    },
+    {
+      "content": null,
+      "created": "2022-05-07T17:51:47.467056Z",
+      "format": null,
+      "last_modified": "2022-04-30T20:03:37.237957Z",
+      "mimetype": "application/json",
+      "name": "karate.json",
+      "path": "karate.json",
+      "size": 3123,
+      "type": "file",
+      "writable": true
+    },
+    {
+      "content": null,
+      "created": "2022-05-07T17:51:47.475971Z",
+      "format": null,
+      "last_modified": "2022-05-07T16:23:26.332706Z",
+      "mimetype": null,
+      "name": "nova-graph.ipynb",
+      "path": "nova-graph.ipynb",
+      "size": 1103989,
+      "type": "notebook",
+      "writable": true
+    },
+    {
+      "content": null,
+      "created": "2022-05-07T17:51:47.469017Z",
+      "format": null,
+      "last_modified": "2022-05-02T22:42:12.890770Z",
+      "mimetype": "application/json",
+      "name": "miserables.json",
+      "path": "miserables.json",
+      "size": 18844,
+      "type": "file",
+      "writable": true
+    }
+  ],
+  "created": "2022-05-07T17:51:47.476818Z",
+  "format": "json",
+  "last_modified": "2022-05-07T17:51:47.476818Z",
+  "mimetype": null,
+  "name": "",
+  "path": "",
+  "size": null,
+  "type": "directory",
+  "writable": true
+}
