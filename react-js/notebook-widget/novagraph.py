@@ -33,7 +33,6 @@ def _make_html(
     """
     html_file = codecs.open("../build/index.html", 'r')
     html_str = html_file.read()
-    print(html_str)
 
     return html.escape(html_str)
 

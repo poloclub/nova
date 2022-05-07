@@ -1,21 +1,9 @@
-import type { GraphClass } from '../Graph/GraphTypes';
-
 export class ConfigPanel {
-  graph: GraphClass;
+  graph;
 
-  constructor(graph: GraphClass) {
+  constructor(graph) {
     this.graph = graph;
   }
-}
-
-export interface ForceParameter {
-  name: string;
-  id: string;
-  min: number;
-  max: number;
-  value: number;
-  step: number;
-  updateStrength: (newStrength: number) => void;
 }
 
 /**
@@ -23,50 +11,50 @@ export interface ForceParameter {
  * @param myGraph Graph object
  * @returns An array of force parameters
  */
-export const initForceParameters = (myGraph: GraphClass): ForceParameter[] => {
-  const forceParameters: ForceParameter[] = [];
+export const initForceParameters = (myGraph) => {
+  const forceParameters = [];
 
-  const forceNodeParameter: ForceParameter = {
+  const forceNodeParameter = {
     name: 'Node Strength',
     id: 'node-strength',
     min: -200,
     max: 60,
     value: myGraph.initStrengths?.nodeStrength || -30,
     step: 1,
-    updateStrength: (d: number) => myGraph.updateNodeForceStrength(d)
+    updateStrength: (d) => myGraph.updateNodeForceStrength(d)
   };
   forceParameters.push(forceNodeParameter);
 
-  const forceLinkParameter: ForceParameter = {
+  const forceLinkParameter = {
     name: 'Link Strength',
     id: 'link-strength',
     min: 0,
     max: 5,
     value: myGraph.initStrengths?.linkStrength || 1,
     step: 0.01,
-    updateStrength: (d: number) => myGraph.updateLinkForceStrength(d)
+    updateStrength: (d) => myGraph.updateLinkForceStrength(d)
   };
   forceParameters.push(forceLinkParameter);
 
-  const forceLinkDistanceParameter: ForceParameter = {
+  const forceLinkDistanceParameter = {
     name: 'Link Distance',
     id: 'link-distance',
     min: 0,
     max: myGraph.width / 3,
     value: myGraph.initStrengths?.linkDistance || 30,
     step: 1,
-    updateStrength: (d: number) => myGraph.updateLinkForceDistance(d)
+    updateStrength: (d) => myGraph.updateLinkForceDistance(d)
   };
   forceParameters.push(forceLinkDistanceParameter);
 
-  const forceCollideParameter: ForceParameter = {
+  const forceCollideParameter = {
     name: 'Collision Strength',
     id: 'collide-strength',
     min: 0,
     max: 20,
     value: myGraph.initStrengths?.collideStrength || 1,
     step: 0.5,
-    updateStrength: (d: number) => myGraph.updateCollideForceStrength(d)
+    updateStrength: (d) => myGraph.updateCollideForceStrength(d)
   };
   forceParameters.push(forceCollideParameter);
 

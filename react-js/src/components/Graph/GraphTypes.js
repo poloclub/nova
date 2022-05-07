@@ -1,75 +1,39 @@
-import d3 from '../../d3-imports.ts';
+import d3 from '../../d3-imports';
 import './Graph.css'
-
-interface NodeData {
-  id: string;
-  group: string;
-}
-
-interface LinkData {
-  source: string;
-  target: string;
-  value?: number;
-}
-
-export interface Strengths {
-  nodeStrength?: number;
-  linkStrength?: number;
-  linkDistance?: number;
-  collideStrength?: number;
-}
-
-interface Node extends d3.SimulationNodeDatum {
-  id: string;
-}
-
-interface Link extends d3.SimulationLinkDatum<Node> {}
-
-export interface GraphData {
-  nodes: NodeData[];
-  links: LinkData[];
-}
-
-interface Padding {
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-}
 
 /**
  * Main class for the Graph Visualization
  */
 export class GraphClass {
-  component: HTMLElement;
-  svg: d3.Selection<d3.BaseType, unknown, null, undefined>;
-  data: GraphData;
-  nodes: Node[];
-  links: Link[];
-  countNodeLink: (node: Node) => number;
+  component;
+  svg;
+  data;
+  nodes;
+  links;
+  countNodeLink;
 
-  nodeGroups: string[];
-  linkValues: number[];
+  nodeGroups;
+  linkValues;
 
-  nodeElements: d3.Selection<d3.BaseType, Node, SVGGElement, unknown>;
-  linkElements: d3.Selection<d3.BaseType, Link, SVGGElement, unknown>;
+  nodeElements;
+  linkElements;
 
-  initStrengths: Strengths | null;
-  forceNode: d3.ForceManyBody<d3.SimulationNodeDatum>;
-  forceLink: d3.ForceLink<d3.SimulationNodeDatum, Link>;
-  forceCenter: d3.ForceCenter<d3.SimulationNodeDatum>;
-  forceCollide: d3.ForceCollide<d3.SimulationNodeDatum>;
+  initStrengths;
+  forceNode;
+  forceLink;
+  forceCenter;
+  forceCollide;
 
-  width: number;
-  height: number;
-  nodeRadius: number;
-  minLinkStrokeWidth: number;
-  maxLinkStrokeWidth: number;
-  padding: Padding;
+  width;
+  height;
+  nodeRadius;
+  minLinkStrokeWidth;
+  maxLinkStrokeWidth;
+  padding;
 
-  colorScale: d3.ScaleOrdinal<string, string, never>;
-  strokeWidthScale: d3.ScaleLinear<number, number, never>;
-  simulation: d3.Simulation<Node, undefined>;
+  colorScale;
+  strokeWidthScale;
+  simulation;
 
   /**
    * Create a Graph object
@@ -88,16 +52,7 @@ export class GraphClass {
     nodeRadius = 5,
     minLinkStrokeWidth = 1,
     maxLinkStrokeWidth = 6
-  }: {
-    component: HTMLElement;
-    data: GraphData;
-    strengths?: Strengths | null;
-    width?: number;
-    height?: number;
-    nodeRadius?: number;
-    minLinkStrokeWidth?: number;
-    maxLinkStrokeWidth?: number;
-    }) {
+  }) {
     this.component = component;
     this.data = data;
     this.padding = {
@@ -141,16 +96,16 @@ export class GraphClass {
     }
 
     // Keep track link counts (used in updating link strength)
-    const nodeLinkCounts: number[] = [];
+    const nodeLinkCounts = [];
     const nodeIDMap = new Map(this.nodes.map((d, i) => [d.id, i]));
     for (const l of this.links) {
-      const sourceIndex = nodeIDMap.get(l.source as string)!;
-      const targetIndex = nodeIDMap.get(l.target as string)!;
+      const sourceIndex = nodeIDMap.get(l.source);
+      const targetIndex = nodeIDMap.get(l.target);
       nodeLinkCounts[sourceIndex] = (nodeLinkCounts[sourceIndex] || 0) + 1;
       nodeLinkCounts[targetIndex] = (nodeLinkCounts[targetIndex] || 0) + 1;
     }
 
-    this.countNodeLink = (node: Node) => {
+    this.countNodeLink = (node) => {
       const curIndex = nodeIDMap.get(node.id);
       if (curIndex !== undefined) {
         return nodeLinkCounts[curIndex];
@@ -162,7 +117,7 @@ export class GraphClass {
     // Initialize the force simulation
     const nodeIDs = data.nodes.map(d => d.id);
     this.forceNode = d3.forceManyBody();
-    this.forceLink = d3.forceLink(this.links).id(node => nodeIDs[node.index!]);
+    this.forceLink = d3.forceLink(this.links).id(node => nodeIDs[node.index]);
     this.forceCenter = d3.forceCenter(width / 2, height / 2);
     this.forceCollide = d3
       .forceCollide()
@@ -174,10 +129,10 @@ export class GraphClass {
       if (strengths.linkStrength !== undefined) {
         this.forceLink.strength(link => {
           return (
-            strengths.linkStrength! /
+            strengths.linkStrength /
             Math.min(
-              this.countNodeLink(link.source as Node),
-              this.countNodeLink(link.target as Node)
+              this.countNodeLink(link.source),
+              this.countNodeLink(link.target)
             )
           );
         });
@@ -240,7 +195,7 @@ export class GraphClass {
       .style('stroke', 'var(--md-gray-400)')
       .style('stroke-opacity', 0.6)
       .style('stroke-width', d =>
-        this.strokeWidthScale(this.linkValues[d.index!])
+        this.strokeWidthScale(this.linkValues[d.index])
       );
 
     // Draw nodes as circles
@@ -252,18 +207,18 @@ export class GraphClass {
       .join('circle')
       .attr('class', 'node')
       .attr('r', this.nodeRadius)
-      .style('fill', d => this.colorScale(this.nodeGroups[d.index!]))
+      .style('fill', d => this.colorScale(this.nodeGroups[d.index]))
       .style('stroke', 'white')
       .style('stroke-width', 1.5);
 
     (
-      nodeElements as d3.Selection<SVGCircleElement, Node, SVGElement, unknown>
+      nodeElements
     ).call(this.#dragFactory());
 
     // Add tooltips for nodes
     nodeElements
       .append('title')
-      .text(d => `${d.id}, ${this.nodeGroups[d.index!]}`);
+      .text(d => `${d.id}, ${this.nodeGroups[d.index]}`);
 
     return { nodeElements, linkElements };
   }
@@ -272,7 +227,7 @@ export class GraphClass {
    * @param x Always keep nodes in the bounding box
    * @returns new x
    */
-  #boxBoundX(x: number) {
+  #boxBoundX(x) {
     return Math.max(this.nodeRadius, Math.min(this.width - this.nodeRadius, x));
   }
 
@@ -280,7 +235,7 @@ export class GraphClass {
    * @param x Always keep nodes in the bounding box
    * @returns new y
    */
-  #boxBoundY(y: number) {
+  #boxBoundY(y) {
     return Math.max(
       this.nodeRadius,
       Math.min(this.height - this.nodeRadius, y)
@@ -294,19 +249,19 @@ export class GraphClass {
     // Update node and link positions
     this.linkElements
       .attr('x1', d => {
-        const source = d.source as Node;
+        const source = d.source
         return source.x ? this.#boxBoundX(source.x) : 0;
       })
       .attr('y1', d => {
-        const source = d.source as Node;
+        const source = d.source
         return source.y ? this.#boxBoundY(source.y) : 0;
       })
       .attr('x2', d => {
-        const target = d.target as Node;
+        const target = d.target
         return target.x ? this.#boxBoundX(target.x) : 0;
       })
       .attr('y2', d => {
-        const target = d.target as Node;
+        const target = d.target
         return target.y ? this.#boxBoundY(target.y) : 0;
       });
 
@@ -319,7 +274,7 @@ export class GraphClass {
    * Bind dragging related event handlers to nodes
    */
   #dragFactory() {
-    const dragstarted = (e: d3.D3DragEvent<SVGCircleElement, Node, Node>) => {
+    const dragstarted = (e) => {
       // Restart the simulation if it has already paused
       if (!e.active) {
         this.simulation.alpha(0.3).restart();
@@ -329,26 +284,26 @@ export class GraphClass {
       e.subject.fy = e.subject.y;
     };
 
-    const dragged = (e: d3.D3DragEvent<SVGCircleElement, Node, Node>) => {
+    const dragged = (e) => {
       // Move the node to the targeted position using fixed position fx and fy
       e.subject.fx = this.#boxBoundX(e.x);
       e.subject.fy = this.#boxBoundY(e.y);
     };
 
-    const dragended = (e: d3.D3DragEvent<SVGCircleElement, Node, Node>) => {
+    const dragended = (e) => {
       // Reset fixed position fx and fy
       e.subject.fx = null;
       e.subject.fy = null;
     };
 
     return d3
-      .drag<SVGCircleElement, Node>()
+      .drag()
       .on('start', dragstarted)
       .on('drag', dragged)
       .on('end', dragended);
   }
 
-  updateNodeForceStrength(newStrength: number) {
+  updateNodeForceStrength(newStrength) {
     // Update the forces
     this.forceNode.strength(newStrength);
 
@@ -356,14 +311,14 @@ export class GraphClass {
     this.simulation.alpha(0.3).restart();
   }
 
-  updateLinkForceStrength(newStrength: number) {
+  updateLinkForceStrength(newStrength) {
     // Update the forces
     this.forceLink.strength((link, i, links) => {
       return (
         newStrength /
         Math.min(
-          this.countNodeLink(link.source as Node),
-          this.countNodeLink(link.target as Node)
+          this.countNodeLink(link.source),
+          this.countNodeLink(link.target)
         )
       );
     });
@@ -372,7 +327,7 @@ export class GraphClass {
     this.simulation.alpha(0.3).restart();
   }
 
-  updateLinkForceDistance(newDistance: number) {
+  updateLinkForceDistance(newDistance) {
     // Update the forces
     this.forceLink.distance(newDistance);
 
@@ -380,7 +335,7 @@ export class GraphClass {
     this.simulation.alpha(0.3).restart();
   }
 
-  updateCollideForceStrength(newStrength: number) {
+  updateCollideForceStrength(newStrength) {
     // Update the forces
     this.forceCollide.strength(newStrength);
 

@@ -1,13 +1,12 @@
 import React from 'react'
 import './Graph.css'
-import { GraphClass } from './GraphTypes.ts';
-import type { GraphData, Strengths } from './GraphTypes.ts';
-import ConfigPanel from '../ConfigPanel/ConfigPanel.tsx';
-import IconGear from '../../images/icon-gear.tsx';
+import { GraphClass } from './GraphTypes.js';
+import ConfigPanel from '../ConfigPanel/ConfigPanel';
+import IconGear from '../../images/icon-gear.js';
 // import IconLogo from '../../images/icon-logo.tsx';
 
-let myGraph: GraphClass | null = null;
-let configPanelStyle = {}
+let myGraph = null;
+let configPanelStyle = {};
 
 const Graph = ({ strengths, width, data, dataset }) => {
   const [configSelected, setConfigSelected] = React.useState(false);

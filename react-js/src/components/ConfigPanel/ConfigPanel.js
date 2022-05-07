@@ -1,7 +1,7 @@
 import React from 'react';
 import './ConfigPanel.css'
-import { initForceParameters } from './ConfigPanelTypes.ts';
-import IconClose from '../../images/icon-close.tsx';
+import { initForceParameters } from './ConfigPanelTypes';
+import IconClose from '../../images/icon-close.js';
 
 const ConfigPanel = ({ height, myGraph, flipConfigSelected }) => {
   const [forceParameters, setForceParameters] = React.useState(null);
@@ -20,7 +20,7 @@ const ConfigPanel = ({ height, myGraph, flipConfigSelected }) => {
           setParameters({ ...parameters, [parameter.name]: parameter.value });
         })
       }
-  }, [forceParameters, parameters])
+  }, [forceParameters])
 
   return (
       <div className="parameter-wrapper" style={{maxHeight: `${Math.max(50, height - 30)}px`}}>

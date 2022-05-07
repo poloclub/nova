@@ -1,23 +1,10 @@
 import React from 'react';
-import d3 from './d3-imports.ts';
+import d3 from './d3-imports';
 import './App.css'
-import Graph from './components/Graph/Graph.tsx'
-import type { GraphData, Strengths } from './components/Graph/GraphTypes';
+import Graph from './components/Graph/Graph.js'
 import karate from './data/karate.json';
 import miserables from './data/miserables.json';
 import stackoverflow from './data/stackoverflow.json';
-
-/**
- * Custom event for notebook message events
- */
-interface NotebookEvent extends Event {
-  data: GraphData;
-  width: number;
-  nodeStrength: number;
-  linkStrength: number;
-  linkDistance: number;
-  collideStrength: number;
-}
 
 const datasets = [
   {
@@ -45,8 +32,8 @@ const App = ({notebookMode}) => {
     if (notebookMode) {
       if (notebookMode) {
         // Listen to the iframe message events
-        document.addEventListener('novaGraphData', (e: Event) => {
-          const notebookEvent = e as NotebookEvent;
+        document.addEventListener('novaGraphData', (e) => {
+          const notebookEvent = e;
           setData(notebookEvent.data);
           setWidth(notebookEvent.width);
           setStrengths({
