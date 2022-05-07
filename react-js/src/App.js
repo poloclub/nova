@@ -39,18 +39,6 @@ const App = ({notebookMode, options}) => {
         collideStrength: options.collideStrength,
 
       })
-        // Listen to the iframe message events
-        // document.addEventListener('novaGraphData', (e) => {
-        //   const notebookEvent = e;
-        //   setData(notebookEvent.data);
-        //   setWidth(notebookEvent.width);
-        //   setStrengths({
-        //     nodeStrength: notebookEvent.nodeStrength,
-        //     linkStrength: notebookEvent.linkStrength,
-        //     linkDistance: notebookEvent.linkDistance,
-        //     collideStrength: notebookEvent.collideStrength
-        //   });
-        // });
     } else {
       // Directly load the data
       setData(datasets[curDatasetIndex].data)
