@@ -1,0 +1,115 @@
+.graph-wrapper {
+  background-color: var(--md-gray-50);
+  border: 1px solid var(--md-gray-300);
+  border-radius: 8px;
+
+  position: relative;
+  aspect-ratio: 1 / 1;
+}
+
+.graph-footer {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  padding: 2px 8px;
+  border-top-right-radius: 5px;
+
+  background-color: hsla(0, 0%, 98.04%, 0.5);
+  color: var(--md-gray-700);
+  font-size: 0.9rem;
+  cursor: default;
+
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.graph-footer a .name {
+  color: var(--md-gray-400);
+}
+
+.graph-footer a .name svg {
+  fill: currentColor;
+  height: 12px;
+}
+
+.config-container {
+  position: absolute;
+  right: 0px;
+  top: 15px;
+  transform: translateX(calc(100% - 3px));
+  box-shadow: 0px 0px 1px 0px hsla(0, 0%, 0%, 0.07),
+    0px 0px 5px 0px hsla(0, 0%, 0%, 0.12);
+  border-radius: 5px;
+  background-color: white;
+
+  animation: fade-in 150ms ease-in-out;
+}
+
+.config-container.no-display {
+  display: none;
+}
+
+.config-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: var(--md-gray-600);
+  background-color: hsla(0, 0%, 98.04%, 0.5);
+
+  border-radius: 3px;
+  padding: 4px;
+  line-height: 1;
+  cursor: pointer;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  transition: color 100ms ease-in-out, background-color 100ms ease-in-out;
+  animation: fade-in 150ms ease-in-out;
+}
+
+.config-button svg {
+  fill: currentColor;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.config-button:hover {
+  color: var(--md-gray-800);
+}
+
+.config-button:active {
+  color: var(--md-gray-900);
+}
+
+.config-button.selected {
+  color: var(--md-gray-800);
+  background-color: hsla(0, 0%, 86%, 0.5);
+}
+
+.config-button svg {
+  fill: currentColor;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.selected {
+  color: var(--md-gray-800);
+  background-color: hsla(0, 0%, 86%, 0.5);
+}
+
+.no-display {
+  display: none;
+}
