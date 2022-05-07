@@ -22,7 +22,7 @@ const datasets = [
   { name: 'Karate Club', file: 'karate', strengths: null, data: karate },
 ];
 
-const App = ({notebookMode}) => {
+const App = ({notebookMode, options}) => {
   const [curDatasetIndex, setCurDatasetIndex] = React.useState(0)
   const [data, setData] = React.useState(null)
   const [width, setWidth] = React.useState(600)
@@ -30,20 +30,27 @@ const App = ({notebookMode}) => {
 
   React.useEffect(() => {
     if (notebookMode) {
-      if (notebookMode) {
+      setData(options.data)
+      setWidth(options.width)
+      setStrengths({
+        nodeStrength: options.nodeStrength,
+        linkStrength: options.linkStrength,
+        linkDistance: options.linkDistance,
+        collideStrength: options.collideStrength,
+
+      })
         // Listen to the iframe message events
-        document.addEventListener('novaGraphData', (e) => {
-          const notebookEvent = e;
-          setData(notebookEvent.data);
-          setWidth(notebookEvent.width);
-          setStrengths({
-            nodeStrength: notebookEvent.nodeStrength,
-            linkStrength: notebookEvent.linkStrength,
-            linkDistance: notebookEvent.linkDistance,
-            collideStrength: notebookEvent.collideStrength
-          });
-        });
-      }
+        // document.addEventListener('novaGraphData', (e) => {
+        //   const notebookEvent = e;
+        //   setData(notebookEvent.data);
+        //   setWidth(notebookEvent.width);
+        //   setStrengths({
+        //     nodeStrength: notebookEvent.nodeStrength,
+        //     linkStrength: notebookEvent.linkStrength,
+        //     linkDistance: notebookEvent.linkDistance,
+        //     collideStrength: notebookEvent.collideStrength
+        //   });
+        // });
     } else {
       // Directly load the data
       setData(datasets[curDatasetIndex].data)
@@ -70,11 +77,10 @@ const App = ({notebookMode}) => {
 
                 ))}
               </div>
-              <div className={`graph-container ${notebookMode ? 'left-align' : ''}`} style={{width: width}}>
-                <Graph strengths={strengths} width={width} data={data} dataset={datasets[curDatasetIndex]}/>
-              </div>
-            </>
-          )}
+            </>)}
+            <div className={`graph-container ${notebookMode ? 'left-align' : ''}`} style={{width: width}}>
+              <Graph strengths={strengths} width={width} data={data} dataset={datasets[curDatasetIndex]}/>
+            </div>
         </div>
       </div>
     </>

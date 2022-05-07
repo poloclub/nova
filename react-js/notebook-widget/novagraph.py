@@ -34,13 +34,27 @@ def _make_html(
     html_file = codecs.open("../build/index.html", 'r')
     html_str = html_file.read()
 
+    data_json = dumps(data)
+
+    html_str = html_str.replace('notebookMode:!1', 'notebookMode:1')
+    # html_str = html_str.replace('"insert data here"', data_json)
+    # html_str = html_str.replace('"insert width here"', str(width))
+    # html_str = html_str.replace('"insert node strength here"', str(node_strength))
+    # html_str = html_str.replace('"insert link strength here"', str(link_strength))
+    # html_str = html_str.replace('"insert link distance here"', str(link_distance))
+    # html_str = html_str.replace('"insert collide strength here"', str(collide_strength))
+
+    stropen = "{"
+    strclose = "}"
+    html_str = html_str.replace('options:null', f"options:{stropen}data:{data_json},width:{width},node_strength:{node_strength},link_strength:{link_strength},link_distance:{link_distance},collide_strength:{collide_strength}{strclose}")
+
     return html.escape(html_str)
 
 
 def visualize(
     data,
     width=500,
-    height=520,
+    height=700,
     node_strength=-30,
     link_strength=1,
     link_distance=30,

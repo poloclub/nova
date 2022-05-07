@@ -5,7 +5,7 @@ import App from './App';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App notebookMode={false}/>
+    <App notebookMode={false} options={null} />
   </React.StrictMode>,
   document.getElementById('root')
 );

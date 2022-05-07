@@ -1,0 +1,8 @@
+{
+    "data": "insert data here", 
+    "width": "insert width here",
+    "node_strength": "insert node strength here",
+    "link_strength": "insert link strength here",
+    "link_distance": "insert link distance here",
+    "collide_strength": "insert collide strength here"
+}
