@@ -89,12 +89,6 @@
   background-color: hsla(0, 0%, 86%, 0.5);
 }
 
-.config-button svg {
-  fill: currentColor;
-  width: 1.2rem;
-  height: 1.2rem;
-}
-
 @keyframes fade-in {
   from {
     opacity: 0;

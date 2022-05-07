@@ -49,7 +49,7 @@ const Graph = ({ strengths, width, data, dataset }) => {
     </div>
 
     <div
-        className={`configButton ${configSelected ? 'selected' : ''}`}
+        className={`config-button ${configSelected ? 'selected' : ''}`}
         onClick={() => {
             setConfigSelected(!configSelected);
         }}
