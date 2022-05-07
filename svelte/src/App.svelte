@@ -3,8 +3,10 @@
   import Graph from './components/graph/Graph.svelte';
   import { onMount } from 'svelte';
   import type { GraphData, Strengths } from './components/graph/Graph';
+  import iconRocket from './images/icon-rocket.svg?raw';
 
   export let notebookMode = false;
+  let showIFrame = false;
 
   /**
    * Custom event for notebook message events
@@ -67,40 +69,76 @@
   @import 'App.scss';
 </style>
 
-<div class="main-app" class:notebook={notebookMode}>
-  <div class="top-grid">
-    {#if !notebookMode}
-      <div class="dataset-container">
-        <div class="dataset-title">Choose a graph</div>
+<div class="demo-page">
+  <div class="main-app" class:notebook={notebookMode}>
+    <!-- <span>Web App</span> -->
+    <div class="top-grid">
+      {#if !notebookMode}
+        <div class="dataset-container">
+          <div class="dataset-title">Choose a graph</div>
 
-        {#each datasets as dataset, i}
-          <div
-            class="dataset-option"
-            class:selected={curDatasetIndex === i}
-            on:click={async () => {
-              curDatasetIndex = i;
-              data = await d3.json(
-                `${import.meta.env.BASE_URL}data/${
-                  datasets[curDatasetIndex].file
-                }`
-              );
-              strengths = datasets[curDatasetIndex].strengths;
-            }}
-          >
-            {dataset.name}
-          </div>
-        {/each}
+          {#each datasets as dataset, i}
+            <div
+              class="dataset-option"
+              class:selected={curDatasetIndex === i}
+              on:click={async () => {
+                curDatasetIndex = i;
+                data = await d3.json(
+                  `${import.meta.env.BASE_URL}data/${
+                    datasets[curDatasetIndex].file
+                  }`
+                );
+                strengths = datasets[curDatasetIndex].strengths;
+              }}
+            >
+              {dataset.name}
+            </div>
+          {/each}
+        </div>
+      {/if}
+
+      {#key data}
+        <div
+          class="graph-container"
+          class:left-align={notebookMode}
+          style={`width: ${width}px;`}
+        >
+          <Graph {strengths} {width} {data} />
+        </div>
+      {/key}
+    </div>
+  </div>
+
+  <div class="jupyter-demo">
+    {#if showIFrame}
+      <iframe
+        title="Jupyter notebook"
+        src="https://poloclub.github.io/timbertrek/notebook/retro/notebooks/?path=campas.ipynb"
+        width="100%"
+        height="100%"
+      />
+    {:else}
+      <div
+        class="demo-placeholder"
+        on:click={() => {
+          showIFrame = true;
+        }}
+      >
+        <div class="mask" />
+        <img
+          alt="Jupyter notebook place holder"
+          src={`${import.meta.env.BASE_URL}data/jupyter-placeholder.png`}
+        />
+        <div
+          class="button"
+          on:click={() => {
+            showIFrame = true;
+          }}
+        >
+          <span class="svg-icon">{@html iconRocket}</span>Launch Jupyter
+          Notebook
+        </div>
       </div>
     {/if}
-
-    {#key data}
-      <div
-        class="graph-container"
-        class:left-align={notebookMode}
-        style={`width: ${width}px;`}
-      >
-        <Graph {strengths} {width} {data} />
-      </div>
-    {/key}
   </div>
 </div>
