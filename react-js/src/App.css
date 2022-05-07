@@ -1,0 +1,79 @@
+.main-app {
+  display: flex;
+  align-items: center;
+  height: calc(100vh - 5px);
+  max-height: 800px;
+  width: 100vw;
+  box-sizing: border-box;
+  overflow-x: hidden;
+
+  position: relative;
+  background-color: white;
+}
+
+.main-app.notebook {
+  max-height: unset;
+}
+
+.top-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: [start] 1fr [mid-start] auto [mid-end] 1fr [end];
+  align-items: center;
+}
+
+.graph-container {
+  grid-column: mid-start / mid-end;
+
+  display: flex;
+  align-items: center;
+}
+
+.graph-container.left-align {
+  grid-column: start / mid-start;
+}
+
+.dataset-container {
+  grid-column: start / mid-start;
+  width: 100%;
+  height: 100%;
+
+  padding-top: 10px;
+  padding-right: 20px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.dataset-title {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.dataset-option {
+  font-size: 0.92rem;
+  font-variant: small-caps;
+  color: var(--md-gray-700);
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.dataset-option.selected {
+  border-bottom: 1px solid var(--md-gray-400);
+}
+
+.notebook-mode {
+  max-height: unset;
+}
+
+.left-align {
+  grid-column: start / mid-start;
+}
+
+.selected {
+  border-bottom: 1px solid var(--md-gray-400);
+}
