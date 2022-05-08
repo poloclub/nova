@@ -1,70 +1,215 @@
-# Getting Started with Create React App
+# React.js Example
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This example demonstrates how one can apply NOVA to adapt a toy visual analytics (VA) tool (NOVA Graph) developed with the React.js framework to support computational notebooks.
 
-## Available Scripts
+## 1. Overview
 
-In the project directory, you can run:
+In this example, we use a toy VA tool called NOVA Graph. This tool can help data scientists visualize graph data using force layout. It allows users to input their own graph data and change force layout parameters.
 
-### `npm start`
+### 1.1. Web App
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+NOVA Graph's web app is developed with React + Javascript + CSS. To run the web app locally, you can use the following commands:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Navigate to this folder
 
-### `npm test`
+```bash
+cd react-js
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Install dependencies
 
-### `npm run build`
+```bash
+npm install
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Run NOVA Graph
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+npm run start
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Open [localhost:3000](localhost:3000) in your browser. You should see NOVA Graph running :)
 
-### `npm run eject`
+### 1.2. Notebook Widget
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+NOVA Graph's notebook widget is a Python package that users can easily install and access in different computational notebooks. To try out this widget, you can use the following commands:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Navigate to the widget folder
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```bash
+cd notebook-widget
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Install the Python package locally (we suggest using a virtual environment such as [virtualenv](https://virtualenv.pypa.io/en/latest/) and [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html))
 
-## Learn More
+```bash
+pip install -e .
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Open example notebooks in JupyterLab
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+cd example
+jupyter lab
+```
 
-### Code Splitting
+Then you can open `nova-graph.ipynb` to try out this widget.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```python
+import novagraph as nova
+from json import load
 
-### Analyzing the Bundle Size
+# Read the data
+miserables = load(open('./miserables.json', 'r'))
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+# Pass data to our VA tool and show it below the cell
+nova.visualize(miserables)
+```
 
-### Making a Progressive Web App
+## 2. NOVA Method
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+In this section, we provide details on how to use the NOVA method to convert NOVA Graph's web app into a notebook widget.
 
-### Advanced Configuration
+### 2.1. Convert the VA tool into a single HTML file
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+The first step is to bundle the web app into a single HTML file. In this example, we use [Webpack](https://webpack.js.org/) with the [html-webpack-inline-source-plugin](https://www.npmjs.com/package/html-webpack-inline-source-plugin).
 
-### Deployment
+The main idea is to (1) tell Webpack to bundle everything used in this web app (e.g., React components, scripts, style sheets, and assets) into a single HTML file; (2) render this HTML file in an ipywidget in a computational notebook.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+The Webpack configuration override is in [`config-overrides.js`](./config-overrides.js):
 
-### `npm run build` fails to minify
+```js
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+module.exports = function override(config, env) {
+    if (env === 'production') {
+    config.plugins
+      .find(plugin => Object.getPrototypeOf(plugin).constructor.name === 'HtmlWebpackPlugin')
+      .options.inlineSource = '.(js|css)$'
+    config.plugins.push(new HtmlWebpackInlineSourcePlugin(HtmlWebpackPlugin))
+  }
+  return config
+}
+```
+
+After having this configuration, you can bundle NOVA Graph with just one command:
+
+```bash
+npm run build
+```
+
+This command generates an HTML file at `build/index.html`.
+
+Next, we want to render this HTML template in Python.
+We do this in [`notebook-widget/novagraph/novagraph.py`](./notebook-widget/novagraph/novagraph.py)
+
+```python
+def _make_html(
+    data, width, node_strength, link_strength, link_distance, collide_strength
+):
+    """
+    Function to create an HTML string to bundle NOVA Graph's html, css, and js.
+    We use base64 to encode the js so that we can use inline defer for <script>
+
+    We add another script to pass Python data as inline json, and dispatch an
+    event to transfer the data
+
+    Args:
+        data(dict): Graph data (nodes and edges)
+        width(int): Width of the main visualization window
+        node_strength(float): Force strength between nodes, range [-200, 60]
+        link_strength(float): Force strength of links, range [0, 5]
+        link_distance(float): Link distance, range [0, width / 3]
+        collide_strength(float): Force strength to avoid node collision, range [0, 20]
+
+    Return:
+        HTML code with deferred JS code in base64 format
+    """
+    html_file = codecs.open("../build/index.html", 'r')
+    html_str = html_file.read()
+
+    data_json = dumps(data)
+
+    html_str = html_str.replace('notebookMode:!1', 'notebookMode:1')
+
+    stropen = "{"
+    strclose = "}"
+    html_str = html_str.replace('options:null', f"options:{stropen}data:{data_json},width:{width},node_strength:{node_strength},link_strength:{link_strength},link_distance:{link_distance},collide_strength:{collide_strength}{strclose}")
+
+    return html.escape(html_str)
+   
+def visualize(
+    data,
+    width=500,
+    height=700,
+    node_strength=-30,
+    link_strength=1,
+    link_distance=30,
+    collide_strength=1,
+):
+    """
+    Render NOVA Graph in the output cell.
+
+    Args:
+        data(dict): Graph data (nodes and edges).
+            {'nodes': [{
+                'id': str (node identifier),
+                'group': str (node category)
+             }],
+             'edges': [{
+                'source': str (source node's id),
+                'source': str (target node's id),
+                'value': float (optional edge weight)
+              }]
+            }
+        width(int): Width of the main visualization window
+        height(int): Height of the whole window
+        node_strength(float): Force strength between nodes, range [-200, 60]
+        link_strength(float): Force strength of links, range [0, 5]
+        link_distance(float): Link distance, range [0, width / 3]
+        collide_strength(float): Force strength to avoid node collision, range [0, 20]
+
+    Return:
+        HTML code with deferred JS code in base64 format
+    """
+
+    # Simple validations
+    assert isinstance(data, dict), "`data` has to be a dictionary."
+    assert "nodes" in data, "`data` is not valid (no `nodes` key)."
+    assert "links" in data, "`data` is not valid (no `links` key)."
+    assert (
+        node_strength >= -200 and node_strength < 60
+    ), "`nodeStrength` needs to be in range [-200, 60]"
+    assert (
+        link_strength >= 0 and link_strength < 5
+    ), "`linkStrength` needs to be in range [0, 5]"
+    assert link_distance >= 0 and link_distance < floor(
+        width / 3
+    ), f"`linkDistance` needs to be in range [0, ${floor(width / 3)}]"
+    assert (
+        collide_strength >= 0 and collide_strength < 20
+    ), "`collideStrength` needs to be in range [0, 20]"
+
+    html_str = _make_html(
+        data, width, node_strength, link_strength, link_distance, collide_strength
+    )
+
+    # Randomly generate an ID for the iframe to avoid collision
+    iframe_id = "nova-graph-iframe-" + str(int(random.random() * 1e8))
+
+    iframe = f"""
+        <iframe
+            srcdoc="{html_str}"
+            frameBorder="0"
+            width="100%"
+            height="{height}px"
+            id="{iframe_id}">
+        </iframe>
+    """
+
+    # Display the iframe
+    display_html(iframe, raw=True)
+```
+
+
