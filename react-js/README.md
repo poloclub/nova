@@ -1,12 +1,22 @@
 # React.js Example
 
-This example demonstrates how one can apply NOVA to adapt a toy visual analytics (VA) tool (NOVA Graph) developed with the React.js framework to support computational notebooks.
+This example demonstrates how one can apply NOVA to adapt a toy visual analytics (VA) tool—NOVA Graph that is developed with the React.js framework—to support computational notebooks.
+
+- [1. Overview](#1-overview)
+  - [1.1. Web App](#11-web-app)
+  - [1.2. Notebook Widget](#12-notebook-widget)
+- [2. NOVA Method](#2-nova-method)
+  - [2.1. Convert the VA tool into a single HTML file](#21-convert-the-va-tool-into-a-single-html-file)
+  - [2.2. Design Python wrapper API](#22-design-python-wrapper-api)
+  - [2.3. Publish the VA widget in a software repository](#23-publish-the-va-widget-in-a-software-repository)
 
 ## 1. Overview
 
 In this example, we use a toy VA tool called NOVA Graph. This tool can help data scientists visualize graph data using force layout. It allows users to input their own graph data and change force layout parameters.
 
 ### 1.1. Web App
+
+![](https://i.imgur.com/64LPc4N.png)
 
 NOVA Graph's web app is developed with React + Javascript + CSS. To run the web app locally, you can use the following commands:
 
@@ -31,6 +41,8 @@ npm run start
 Open [localhost:3000](localhost:3000) in your browser. You should see NOVA Graph running :)
 
 ### 1.2. Notebook Widget
+
+![](https://i.imgur.com/sm89OAs.png)
 
 NOVA Graph's notebook widget is a Python package that users can easily install and access in different computational notebooks. To try out this widget, you can use the following commands:
 
@@ -138,7 +150,13 @@ def _make_html(
     html_str = html_str.replace('options:null', f"options:{stropen}data:{data_json},width:{width},node_strength:{node_strength},link_strength:{link_strength},link_distance:{link_distance},collide_strength:{collide_strength}{strclose}")
 
     return html.escape(html_str)
-   
+```
+
+### 2.2. Design Python wrapper API
+
+To allow users to pass data and configurations into the notebook widget, we can design a Python function API that first collects and validates user input, and then send input to the widget through standard Web Events. Then we display the HTML string as an `iframe` in a notebook cell:
+
+```python
 def visualize(
     data,
     width=500,
@@ -212,4 +230,15 @@ def visualize(
     display_html(iframe, raw=True)
 ```
 
+### 2.3. Publish the VA widget in a software repository
 
+To enable users to easily install this widget (with only one command), we can package it into a Python library and publish it on [Python Package Index (PyPI)](https://pypi.org/project/nova-graph/).
+
+Publishing a Python package is a standard and easy process. If you have never published any Python package before, you can refer to this [great tutorial](https://realpython.com/pypi-publish-python-package/) to learn how to set up a PyPI account and publish your first package!
+
+To publish the package on PyPI, we can run the following commands.
+
+```bash
+python3 -m build
+python3 -m twine upload --repository nova-graph --skip-existing dist/*
+```

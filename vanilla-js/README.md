@@ -7,7 +7,7 @@ This example demonstrates how one can apply NOVA to adapt a toy visual analytics
   - [1.2. Notebook Widget](#12-notebook-widget)
 - [2. NOVA Method](#2-nova-method)
   - [2.1. Convert the VA tool into a single HTML file](#21-convert-the-va-tool-into-a-single-html-file)
-    - [2.1.1. Vite Configuration](#211-vite-configuration)
+    - [2.1.1. Rollup Configuration](#211-rollup-configuration)
     - [2.1.2. Inject JS into an HTML template](#212-inject-js-into-an-html-template)
   - [2.2. Design Python wrapper API](#22-design-python-wrapper-api)
   - [2.3. Publish the VA widget in a software repository](#23-publish-the-va-widget-in-a-software-repository)
