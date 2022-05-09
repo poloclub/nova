@@ -1,6 +1,6 @@
 # Svelte Example
 
-This example demonstrates how one can apply NOVA to adapt a toy visual analytics (VA) tool—NOVA Graph that is developed with the Svelte framework to support computational notebooks.
+This example demonstrates how one can apply NOVA to adapt a toy visual analytics (VA) tool—NOVA Graph that is developed with the Svelte framework—to support computational notebooks.
 
 - [1. Overview](#1-overview)
   - [1.1. Web App](#11-web-app)
@@ -26,7 +26,7 @@ NOVA Graph's web app is developed with Svelte + Typescript + SCSS. To run the we
 Navigate to this folder
 
 ```bash
-cd svelte
+cd svelte-ts
 ```
 
 Install dependencies
@@ -193,6 +193,43 @@ The function `_make_html()` injects the JS file into an HTML base64 string and r
 ### 2.2. Design Python wrapper API
 
 To allow users to pass data and configurations into the notebook widget, we can design a Python function API that first collects and validates user input, and then send input to the widget through standard Web Events.
+
+```python
+def _make_html(data):
+    # ...
+    # Convert json dict to string
+    data_json = dumps(data)
+
+    # Pass data into JS by using another script to dispatch an event
+    messenger_js = f"""
+        (function() {{
+            const event = new Event('novaGraphData');
+            event.data = {data_json};
+            event.width = {width};
+            event.nodeStrength = {node_strength};
+            event.linkStrength = {link_strength};
+            event.linkDistance = {link_distance};
+            event.collideStrength = {collide_strength};
+            document.dispatchEvent(event);
+        }}())
+    """
+    messenger_js = messenger_js.encode()
+    messenger_js_base64 = base64.b64encode(messenger_js).decode("utf-8")
+
+    # Inject the JS to the html template
+    html_str = (
+        html_top
+        + """<script defer src='data:text/javascript;base64,{}'></script>""".format(
+            js_base64
+        )
+        + """<script defer src='data:text/javascript;base64,{}'></script>""".format(
+            messenger_js_base64
+        )
+        + html_bottom
+    )
+```
+
+Then we display the HTML string as an `iframe` in a notebook cell:
 
 ```python
 def visualize(
