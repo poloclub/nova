@@ -2,10 +2,10 @@
 
 [![Github Actions Status](https://github.com/poloclub/nova/workflows/build/badge.svg)](https://github.com/poloclub/nova/actions/workflows/build.yml)
 [![license](https://img.shields.io/badge/License-MIT-brightgreen)](https://github.com/poloclub/nova/blob/master/LICENSE)
+[![pypi](https://img.shields.io/pypi/v/nova-graph?color=blue)](https://pypi.python.org/pypi/nova-graph)
 [![Lite](https://gist.githubusercontent.com/xiaohk/9b9f7c8fa162b2c3bc3251a5c9a799b2/raw/a7fca1d0a2d62c2b49f60c0217dffbd0fe404471/lite-badge-launch-small.svg)](https://poloclub.github.io/nova/notebook)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/poloclub/nova/master?urlpath=lab/tree/svelte-ts/notebook-widget/example/nova-graph.ipynb)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1WPT-pjO4-qNdD-UYwrFk7DVwAl2XrHBB?usp=sharing)
-[![pypi](https://img.shields.io/pypi/v/nova-graph?color=blue)](https://pypi.python.org/pypi/nova-graph)
 <!-- [![arxiv badge](https://img.shields.io/badge/arXiv-2202.11086-red)](https://arxiv.org/abs/2202.11086) -->
 <!-- [![DOI:10.1145/3491101.3519653](https://img.shields.io/badge/DOI-10.1145/3491101.3519653-blue)](https://doi.org/10.1145/3491101.3519653) -->
 
