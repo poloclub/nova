@@ -6,6 +6,7 @@ import IconClose from '../../images/icon-close.js';
 const ConfigPanel = ({ height, myGraph, flipConfigSelected }) => {
   const [forceParameters, setForceParameters] = React.useState(null);
   const [parameters, setParameters] = React.useState({});
+  const [forceParametersUpdated, setForceParametersUpdated] = React.useState(false);
 
   React.useEffect(() => {
     if (myGraph) {
@@ -15,12 +16,13 @@ const ConfigPanel = ({ height, myGraph, flipConfigSelected }) => {
 
   React.useEffect(() => {
       setParameters({})
-      if (forceParameters) {
+      if (forceParametersUpdated && forceParameters) {
         forceParameters.forEach((parameter) => {
           setParameters({ ...parameters, [parameter.name]: parameter.value });
         })
+        setForceParametersUpdated(false);
       }
-  }, [forceParameters])
+  }, [forceParameters, parameters, forceParametersUpdated])
 
   return (
       <div className="parameter-wrapper" style={{maxHeight: `${Math.max(50, height - 30)}px`}}>
@@ -51,6 +53,7 @@ const ConfigPanel = ({ height, myGraph, flipConfigSelected }) => {
               forceParameters.forEach((parameter) => {
                 setParameters({ ...parameters, [parameter.name]: parameter.value });
               })
+              setForceParametersUpdated(true);
               parameters[parameter.name] = parseFloat(e.currentTarget.value);
             }
           }

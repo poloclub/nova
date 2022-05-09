@@ -1,5 +1,4 @@
 import React from 'react';
-import d3 from './d3-imports';
 import './App.css'
 import Graph from './components/Graph/Graph.js'
 import karate from './data/karate.json';
@@ -44,7 +43,7 @@ const App = ({notebookMode, options}) => {
       setData(datasets[curDatasetIndex].data)
       setStrengths(datasets[curDatasetIndex].strengths);
     }
-  }, [notebookMode])
+  }, [notebookMode, options, curDatasetIndex])
   
   return (
     <>
