@@ -28,12 +28,12 @@ jobs:
     - name: Install dependencies [Svelte]
       run: cd svelte-ts && npm install
     - name: Build [Svelte]
-      run: npm run build && npm run build:notebook && cd ..
+      run: cd svelte-ts && npm run build && npm run build:notebook
     - name: Install dependencies [Vanilla]
       run: cd vanilla-ts && npm install
     - name: Build [Vanilla]
-      run: npm run build && npm run build:notebook && cd ..
+      run: cd vanilla-ts && npm run build && npm run build:notebook
     - name: Install dependencies [React]
       run: cd react-js && npm install
     - name: Build [React]
-      run: npm run start && npm run build
+      run: cd react-js && npm run start && npm run build
