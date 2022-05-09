@@ -71,8 +71,8 @@
 
 <div class="demo-page">
   <div class="main-app" class:notebook={notebookMode}>
-    <!-- <span>Web App</span> -->
     <div class="top-grid">
+      <span class="right-header">Web App</span>
       {#if !notebookMode}
         <div class="dataset-container">
           <div class="dataset-title">Choose a graph</div>
@@ -109,36 +109,40 @@
     </div>
   </div>
 
-  <div class="jupyter-demo">
-    {#if showIFrame}
-      <iframe
-        title="Jupyter notebook"
-        src="https://poloclub.github.io/timbertrek/notebook/retro/notebooks/?path=campas.ipynb"
-        width="100%"
-        height="100%"
-      />
-    {:else}
-      <div
-        class="demo-placeholder"
-        on:click={() => {
-          showIFrame = true;
-        }}
-      >
-        <div class="mask" />
-        <img
-          alt="Jupyter notebook place holder"
-          src={`${import.meta.env.BASE_URL}data/jupyter-placeholder.png`}
+  <div class="jupyter-demo-wrapper">
+    <span class="right-header">Notebook Widget</span>
+
+    <div class="jupyter-demo">
+      {#if showIFrame}
+        <iframe
+          title="Jupyter notebook"
+          src="https://poloclub.github.io/nova/notebook/retro/notebooks/?path=nova-graph.ipynb"
+          width="100%"
+          height="100%"
         />
+      {:else}
         <div
-          class="button"
+          class="demo-placeholder"
           on:click={() => {
             showIFrame = true;
           }}
         >
-          <span class="svg-icon">{@html iconRocket}</span>Launch Jupyter
-          Notebook
+          <div class="mask" />
+          <img
+            alt="Jupyter notebook place holder"
+            src={`${import.meta.env.BASE_URL}data/jupyter-placeholder.png`}
+          />
+          <div
+            class="button"
+            on:click={() => {
+              showIFrame = true;
+            }}
+          >
+            <span class="svg-icon">{@html iconRocket}</span>Launch Jupyter
+            Notebook
+          </div>
         </div>
-      </div>
-    {/if}
+      {/if}
+    </div>
   </div>
 </div>

@@ -21,11 +21,23 @@
   }
 }
 
+.right-header {
+  position: absolute;
+  top: -10px;
+  left: 10px;
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--md-gray-400);
+  width: 400px;
+}
+
 .top-grid {
   width: 100%;
   display: grid;
   grid-template-columns: [start] 1fr [mid-start] auto [mid-end] 1fr [end];
   align-items: center;
+  position: relative;
 }
 
 .graph-container {
@@ -70,11 +82,20 @@
   }
 }
 
+.jupyter-demo-wrapper {
+  width: 100%;
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+}
+
 .jupyter-demo {
-  width: 100ch;
+  width: 90ch;
   display: flex;
   height: 800px;
   padding-bottom: 50px;
+  position: relative;
 
   iframe {
     border: 1px solid var(--md-gray-400);
