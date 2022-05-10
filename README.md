@@ -6,7 +6,7 @@
 [![Lite](https://gist.githubusercontent.com/xiaohk/9b9f7c8fa162b2c3bc3251a5c9a799b2/raw/a7fca1d0a2d62c2b49f60c0217dffbd0fe404471/lite-badge-launch-small.svg)](https://poloclub.github.io/nova/notebook)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/poloclub/nova/master?urlpath=lab/tree/svelte-ts/notebook-widget/example/nova-graph.ipynb)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1WPT-pjO4-qNdD-UYwrFk7DVwAl2XrHBB?usp=sharing)
-<!-- [![arxiv badge](https://img.shields.io/badge/arXiv-2202.11086-red)](https://arxiv.org/abs/2202.11086) -->
+[![arxiv badge](https://img.shields.io/badge/arXiv-2205.03963-red)](https://arxiv.org/abs/2205.03963)
 <!-- [![DOI:10.1145/3491101.3519653](https://img.shields.io/badge/DOI-10.1145/3491101.3519653-blue)](https://doi.org/10.1145/3491101.3519653) -->
 
 A simple and flexible method to create notebook-ready visual analytics tools!
@@ -63,6 +63,8 @@ Check out three live notebook demos below.
 
 ## Open-source VA tools that use NOVA
 
+If your open-source VA tool also applies NOVA to create notebook widgets, please submit a [pull request](https://github.com/poloclub/nova/pulls) to add your tool on top of this table :)
+
 |Name|Description|
 |:---|:---|
 [Visual Auditor](https://github.com/poloclub/visual-auditor)|Interactive visualization system for identifying and understanding biases in machine learning models.|
@@ -72,6 +74,20 @@ Check out three live notebook demos below.
 ## Credits
 
 NOVA is created by <a href='https://zijie.wang/' target='_blank'>Jay Wang</a>, <a href='https://www.linkedin.com/in/dmunechika' target='_blank'>David Munechika</a>, <a href='http://www.seongmin.xyz' target='_blank'>Seongmin Lee</a>, and <a href='' target='_blank'>Polo Chau</a>.
+
+## Citation
+
+```bibTeX
+@article{wangNOVAPracticalMethod2022,
+  title = {{{NOVA}}: {{A Practical Method}} for {{Creating Notebook-Ready Visual Analytics}}},
+  shorttitle = {{{NOVA}}},
+  author = {Wang, Zijie J. and Munechika, David and Lee, Seongmin and Chau, Duen Horng},
+  year = {2022},
+  month = may,
+  journal = {arXiv:2205.03963 [cs]},
+  archiveprefix = {arXiv}
+}
+```
 
 ## License
 
