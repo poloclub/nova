@@ -25,7 +25,7 @@ A simple and flexible method to create notebook-ready visual analytics tools!
 
 |<img src='https://i.imgur.com/tlkVvjt.png'>|
 |:---:|
-|<a href="https://youtu.be/3eGqTmsStJM">"NOVA: A Practical Method for Creating Notebook-Ready Visual Analytics"</a>|
+|<a href="https://arxiv.org/abs/2205.03963">"NOVA: A Practical Method for Creating Notebook-Ready Visual Analytics"</a>|
 
 ## Overview
 
